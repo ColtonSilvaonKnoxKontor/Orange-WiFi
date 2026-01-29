@@ -36,6 +36,9 @@ This software enforces security measures, warnings and mandatory lockdown mechan
 - **Why we can't customized the captive portal page?**
 Uploading a custom Captive Portal is one of the methods of RCE and Backdoors. I do not implement this for a while until I sanitized all code that is related to direct shell executions or sql commands.
 
+- **Is this the perfect alternative to commercial brands?**
+No, it only includes coin and voucher for Wi-Fi vending needs. No PPPoE, e-Wallet, e-Load, charging, PC rental, or anything you think.
+
 # Recruiting Help
 
 - Need to add charging, e-wallet and e-load support (if you want it).
