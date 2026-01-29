@@ -6,6 +6,8 @@ Orange WiFi is a single, non-centralized vendo software for Piso WiFi, suitable 
 
 This software enforces security measures, warnings and mandatory lockdown mechanism for potential attacks at runtime.
 
+<img width="720" height="1600" alt="portal" src="https://github.com/user-attachments/assets/ad1be687-cf47-49f2-bb3f-c6c2135779ff" /> This is a preview of incomplete alpha build, it may change or remove features that are still existing, mostly from foswvs artifacts.
+
 # Features
 - Latest Armbian version, minimal build.
 
