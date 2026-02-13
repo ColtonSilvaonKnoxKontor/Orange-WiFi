@@ -13,6 +13,8 @@ This software enforces security measures, warnings and mandatory lockdown mechan
 
 - Modern portal UI. Can add background image, and change custom font styles.
 
+- Supports radio-like system for music playback as amusement for customer.
+
 - It has HDMI display working so that you will know if the system is alive, or does "Kernel Panic" instead of seeing kernel logs to serial UART, and it uses OpenBox as ultra lightweight alternative to known desktop environment like LXDE, XFCE, or LXQT.
 
 - Supports basic logs within orange wifi operation, security level log to see sudo session and ssh logging attempts and very advanced logs for low-level system (eg. kernel log) to see what's wrong with the system.
@@ -25,7 +27,7 @@ This software enforces security measures, warnings and mandatory lockdown mechan
 
 - File integrity checker to ensure that there is no patches in each source files.
 
-> unlike commercialized one that relies on database in which if there is an RCE entrypoint, they can get that password inside database easily because the database password is also visible in some files scattered to random directories. The examples are LPB (readable password) and PisoFi (hashed using base64 but can be easily cracked)
+> unlike commercialized one that relies on database in which if there is an RCE entrypoint, they can get that password inside database easily because the database password is also visible in some files scattered to random directories.
 
 # At First Time Use
 - Make sure that you copy-pasted the **Orange Star ID** to a safe place, because this ID will be used if your system got fucked up by the attacker. There is a "Burn It!" button that if you pressed it, you will never see the Orange Star ID again. This Orange Star ID is not hardcoded on your internal server because it is done by calculations.
@@ -53,7 +55,7 @@ No, it only includes coin and voucher for Wi-Fi vending needs. No PPPoE, e-Walle
 
 # Security ToDo
 
-Since this is based on Armbian image, the chance on getting attacked by using RCE is high (based on my previous vulnerability investigation with Armbian-based system like LPB, PisoFi, 1Click, etc), unlike the OpenWRT-based which the system is definitely read only and then only configs, datas and states are on a separate read-write partition. Another problem is that obfuscating php is useless here as anyone can create the deobfuscator easily, or they can download to github, so I leave the php file as is except for critical ones. I will strengthen the software security just to block RCE entrypoint.
+Since this is based on Armbian image, the chance on getting attacked by using RCE is high (based on my previous vulnerability investigation with commercial brand, in Armbian-based system), unlike the OpenWRT-based which the system is definitely read only and then only configs, datas and states are on a separate read-write partition. Another problem is that obfuscating php is useless here as anyone can create the deobfuscator easily, or they can download to github, so I leave the php file as is except for critical ones. I will strengthen the software security just to block RCE entrypoint.
 
 # But where is the Source Code:
 
