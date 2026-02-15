@@ -2,6 +2,8 @@
 
 > Work in Progress
 
+<i>**A Free Piso WiFi Software made for Paranoids**</i>
+
 Orange WiFi is a single, non-centralized vendo software for Piso WiFi, suitable for inexpensive builds.  As for now,  it only supports Orange Pi One unit. This is free to use, no **fucking license** needed as I am loyal to free and open source software.
 
 This software enforces security measures, warnings and mandatory lockdown mechanism for potential attacks at runtime.
@@ -15,7 +17,7 @@ This software enforces security measures, warnings and mandatory lockdown mechan
 
 - Supports radio-like system for music playback as amusement for customer.
 
-- It has HDMI display working so that you will know if the system is alive, or does "Kernel Panic" instead of seeing kernel logs to serial UART, and it uses OpenBox as ultra lightweight alternative to known desktop environment like LXDE, XFCE, or LXQT.
+- It has HDMI display working so that you will know if the system is alive, or does "Kernel Panic" instead of seeing kernel logs to serial UART, and to see or to recover the Orange Star ID. It uses OpenBox as ultra lightweight alternative to known desktop environment like LXDE, XFCE, or LXQT.
 
 - Supports basic logs within orange wifi operation, security level log to see sudo session and ssh logging attempts and very advanced logs for low-level system (eg. kernel log) to see what's wrong with the system.
 
@@ -27,10 +29,10 @@ This software enforces security measures, warnings and mandatory lockdown mechan
 
 - File integrity checker to ensure that there is no patches in each source files.
 
-> unlike commercialized one that relies on database in which if there is an RCE entrypoint, they can get that password inside database easily because the database password is also visible in some files scattered to random directories.
+> At this time, it only support inexpensive build (cheap routers), no VLAN or bridge interface support.
 
 # At First Time Use
-- Make sure that you copy-pasted the **Orange Star ID** to a safe place, because this ID will be used if your system got fucked up by the attacker. There is a "Burn It!" button that if you pressed it, you will never see the Orange Star ID again. This Orange Star ID is not hardcoded on your internal server because it is done by calculations.
+- Make sure that you copy-pasted the **Orange Star ID** to a safe place, because this ID will be used if your system got fucked up by the attacker. There is a "Burn It!" button that if you pressed it, you will never see the Orange Star ID again. This Orange Star ID is not hardcoded on your internal server because it is done by calculations. But if the attacker somehow managed to obtain Orange Star ID, you can reshuffle it only by doing it inside physical terminal; and accessing this via ssh remote and unauthorized user will be automatically rejected.
 
 - You must have fan + heatsink because this software might fry the processor if it is poorly ventilated
 
@@ -39,7 +41,7 @@ This software enforces security measures, warnings and mandatory lockdown mechan
 Uploading a custom Captive Portal is one of the methods of RCE and Backdoors. I do not implement this for a while until I sanitized all code that is related to direct shell executions or sql commands.
 
 - **Is this the perfect alternative to commercial brands?**
-No, it only includes coin and voucher for Wi-Fi vending needs. No PPPoE, e-Wallet, e-Load, charging, PC rental, or anything you think.
+No, it only includes coin and voucher for Wi-Fi vending needs. No PPPoE, e-Wallet, e-Load, charging, PC rental, or anything you think. So if you are not satisfied in Orange WiFi's features, you may use your favorite commercialized brands.
 
 # Recruiting Help
 
