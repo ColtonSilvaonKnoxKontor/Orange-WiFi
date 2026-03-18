@@ -8,7 +8,7 @@ Orange WiFi is a single, non-centralized vendo software for Piso WiFi, suitable 
 
 This software enforces security measures, warnings and mandatory lockdown mechanism for potential attacks at runtime.
 
-<img width="720" height="1600" alt="portal" src="https://github.com/user-attachments/assets/ad1be687-cf47-49f2-bb3f-c6c2135779ff" /> This is a preview of incomplete alpha build, it may change or remove features that are still existing, mostly from foswvs artifacts.
+<img width="720" height="1600" alt="portal" src="https://github.com/user-attachments/assets/ad1be687-cf47-49f2-bb3f-c6c2135779ff" /> <br />This is a preview of incomplete alpha build, it may change or remove features that are still existing, mostly from foswvs artifacts.
 
 # Features
 - Latest Armbian version, minimal build.
@@ -20,6 +20,8 @@ This software enforces security measures, warnings and mandatory lockdown mechan
 - It has HDMI display working so that you will know if the system is alive, or does "Kernel Panic" instead of seeing kernel logs to serial UART, and to see or to recover the Orange Star ID. It uses OpenBox as ultra lightweight alternative to known desktop environment like LXDE, XFCE, or LXQT.
 
 - Supports basic logs within orange wifi operation, security level log to see sudo session and ssh logging attempts and very advanced logs for low-level system (eg. kernel log) to see what's wrong with the system.
+
+- DoS Protection included
 
 - Uses XXXXXXXX, and SXXXXS for password hashing and it enforced very strict security lockdown on admin dashboard if the password file is removed 
 
@@ -37,8 +39,6 @@ This software enforces security measures, warnings and mandatory lockdown mechan
 - You must have fan + heatsink because this software might fry the processor if it is poorly ventilated
 
 # FAQ
-- **Why we can't customized the captive portal page?**
-Uploading a custom Captive Portal is one of the methods of RCE and Backdoors. I do not implement this for a while until I sanitized all code that is related to direct shell executions or sql commands.
 
 - **Is this the perfect alternative to commercial brands?**
 No, it only includes coin and voucher for Wi-Fi vending needs. No PPPoE, e-Wallet, e-Load, charging, PC rental, or anything you think. So if you are not satisfied in Orange WiFi's features, you may use your favorite commercialized brands.
