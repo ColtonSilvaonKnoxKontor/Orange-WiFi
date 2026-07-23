@@ -4,7 +4,7 @@
 
 I published the source code as I stopped developing this, and I am no longer operating exploited Piso WiFi systems. Take note that all of the source code are AI generated via Gemini CLI until transition to their bullshit AES enabled Antigravity so you can see some slop comments like "Authoritative" or "Editions".
 
-They contain mess from unrelated source code and other artifacts that needs to remove.
+These files was intended to be closed source and only distribute ready to flash .img file. It was stored in my Local Storage until I do bulk push all of them due to months of inactivity. They contain mess from unrelated source code and other artifacts that needs to remove. You have to figure it out what each of them can do, and what package it needs to be installed.
 
 The `nkvd_password` is meant for frontend access to ssh so that no one can touch the internal Armbian binaries and serves as reshuffler of hardware ID, same concept as DVR and ISP routers that uses Dopra Linux in Huawei GPON/EPON term. It uses soviet-era dialog and it serves as my entertainment rather than professional-look text interface. `softup` is meant for software update binary for Orange-WiFi and of course updating Armbian.
 
