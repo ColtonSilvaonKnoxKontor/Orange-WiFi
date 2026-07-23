@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bandwidth Control | SILVASYSTEMS</title>
+    <link rel="stylesheet" href="/css/pico.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #ff6600; }
+        body { padding: 20px; background-color: #f8fafc; min-height: 100vh; font-family: system-ui, -apple-system, sans-serif; }
+        
+        .header-box { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 3px solid #ff6600; padding-bottom: 15px; }
+        .header-box h2 { margin: 0; color: #1a202c; text-transform: uppercase; font-weight: 900; letter-spacing: 1px; }
+
+        .settings-card { background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #edf2f7; margin-bottom: 25px; }
+        h4 { color: #1a202c; text-transform: uppercase; font-weight: 800; font-size: 0.9rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        
+        .info-text { font-size: 0.8rem; color: #64748b; margin-top: 5px; font-weight: 600; }
+        
+        input, select { border-radius: 10px; font-weight: 700; border: 2px solid #f1f5f9; margin-bottom: 0 !important; }
+        
+        .gen-btn { background: #1a202c; border: none; border-radius: 12px; font-weight: 800; padding: 12px; color: white; cursor: pointer; text-transform: uppercase; width: 100%; transition: all 0.2s; }
+        .gen-btn:hover { background: #4a5568; }
+        .btn-orange { background: #ff6600 !important; }
+        .btn-orange:hover { background: #e65c00 !important; }
+
+        .status-box { background: #0f172a; color: #4ade80; padding: 15px; border-radius: 10px; font-family: monospace; font-size: 0.8rem; margin-top: 20px; min-height: 100px; overflow-y: auto; border: 1px solid #1e293b; white-space: pre-wrap; }
+    </style>
+    <script src="security_check.js"></script>
+</head>
+<body>
+    <main>
+        <div class="header-box">
+            <h2>Bandwidth Control</h2>
+        </div>
+
+        <div class="container" style="max-width: 800px; padding: 0;">
+            <div class="settings-card">
+                <h4><i class="fas fa-globe"></i> Global Bandwidth Limiter</h4>
+                <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 25px;">Define traffic limits for specific network interfaces.</p>
+                
+                <form id="bw-form">
+                    <div class="grid">
+                        <label>
+                            <strong>Target Interface</strong>
+                            <select id="interface" name="interface">
+                                <option value="eth1">eth1 (LAN/Clients)</option>
+                                <option value="eth0">eth0 (WAN/Internet)</option>
+                                <option value="wlan0">wlan0 (Wireless Dongle)</option>
+                            </select>
+                        </label>
+                        <label>
+                            <strong>Operation</strong>
+                            <select id="status" name="status">
+                                <option value="enabled">ENABLED</option>
+                                <option value="disabled">DISABLED</option>
+                            </select>
+                        </label>
+                    </div>
+
+                    <div class="grid" style="margin-top: 20px;">
+                        <label>
+                            <strong>Download Limit (Kbps)</strong>
+                            <input type="number" id="down" name="down" placeholder="e.g. 5000" value="0">
+                            <span class="info-text">1000 Kbps = 1 Mbps</span>
+                        </label>
+                        <label>
+                            <strong>Upload Limit (Kbps)</strong>
+                            <input type="number" id="up" name="up" placeholder="e.g. 1000" value="0">
+                        </label>
+                    </div>
+
+                    <div style="margin-top: 30px;">
+                        <button type="button" class="gen-btn btn-orange" id="apply-btn" onclick="applyLimit()">Apply Settings</button>
+                    </div>
+                </form>
+
+                <div id="log" class="status-box">System ready. Select parameters and apply.</div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        async function loadSettings() {
+            try {
+                const r = await fetch('../../management/bandwidth_api.php?action=get');
+                const data = await r.json();
+                if(data) {
+                    document.getElementById('interface').value = data.interface || 'eth1';
+                    document.getElementById('status').value = data.status || 'disabled';
+                    document.getElementById('down').value = data.down || 0;
+                    document.getElementById('up').value = data.up || 0;
+                }
+            } catch(e) {}
+        }
+
+        async function applyLimit() {
+            const log = document.getElementById('log');
+            const btn = document.getElementById('apply-btn');
+            
+            btn.disabled = true;
+            btn.innerHTML = "Processing...";
+            log.innerHTML = "[INFO] Applying traffic policy...\n";
+            
+            const payload = {
+                interface: document.getElementById('interface').value,
+                status: document.getElementById('status').value,
+                down: document.getElementById('down').value,
+                up: document.getElementById('up').value
+            };
+
+            try {
+                const r = await fetch('../../management/bandwidth_api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const res = await r.text();
+                // Physically sanitize logs to hide wondershaper
+                log.innerHTML += res.replace(/wondershaper/gi, "Traffic Engine");
+            } catch(e) {
+                log.innerHTML += "[ERROR] Connection failure.";
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = "Apply Settings";
+            }
+        }
+
+        window.onload = loadSettings;
+    </script>
+</body>
+</html>

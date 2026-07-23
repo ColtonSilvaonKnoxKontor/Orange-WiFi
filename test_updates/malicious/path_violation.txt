@@ -1,0 +1,4 @@
+[!] By Colton Silva (chinawaterstealers).
+MALICIOUS: Attempting to reference system binary path
+Targeting: /usr/bin/silvasystems
+Accessing: /sbin/reboot

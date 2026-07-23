@@ -1,0 +1,211 @@
+:root {
+    --primary: #ff6600 !important;
+    --primary-hover: #e65c00 !important;
+    --primary-focus: rgba(255, 102, 0, 0.125) !important;
+    --primary-inverse: #fff !important;
+}
+
+/* Sidebar Constants */
+:root {
+    --sidebar-bg: #11191f;
+    --sidebar-text: #fff;
+    --active-link: #ff6600;
+    --hover-link: #2c3e50;
+    --sidebar-width: 260px;
+    --header-height: 60px;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #f0f0f0 !important;
+    color: #333 !important;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+.dashboard-container {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    position: relative;
+    background-color: #f0f0f0 !important;
+}
+
+/* Sidebar Base Styles */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+    z-index: 2000;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar .brand {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid #2d3748;
+}
+
+.sidebar .brand h3 {
+    margin: 0;
+    color: #fff !important;
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.sidebar nav {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.sidebar nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar nav a {
+    display: block;
+    padding: 12px 20px;
+    color: #cbd5e0 !important;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border-left: 4px solid transparent;
+    font-size: 0.95rem;
+}
+
+.sidebar nav a:hover {
+    background-color: var(--hover-link);
+    color: #fff !important;
+}
+
+.sidebar nav a.active {
+    background-color: #1a2632;
+    color: #fff !important;
+    border-left-color: var(--active-link);
+}
+
+.main-window {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #fff !important;
+    width: 100%;
+    min-width: 0;
+}
+
+iframe#content-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+    background-color: #fff !important;
+}
+
+/* --- MOBILE RESPONSIVE LOGIC --- */
+
+.mobile-header {
+    display: none;
+    height: var(--header-height);
+    background: var(--sidebar-bg);
+    color: #fff !important;
+    align-items: center;
+    padding: 0 60px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    z-index: 1500;
+    width: 100%;
+}
+
+.mobile-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--active-link) !important;
+    text-transform: uppercase;
+}
+
+.mobile-toggle {
+    display: none;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 2500;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    padding: 5px;
+}
+
+.mobile-toggle span {
+    display: block;
+    width: 100%;
+    height: 3px;
+    background-color: #fff !important;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    z-index: 1800;
+    backdrop-filter: blur(2px);
+}
+
+/* --- GLOBAL TABLE RESPONSIVENESS --- */
+/* This ensures every table container inside submenus can scroll sideways */
+.table-container {
+    width: 100%;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 992px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        transform: translateX(-100%);
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .mobile-header, .mobile-toggle {
+        display: flex !important;
+    }
+
+    .menu-open .overlay {
+        display: block;
+    }
+
+    .menu-open .mobile-toggle span:nth-child(1) { transform: translateY(9px) rotate(45deg); }
+    .menu-open .mobile-toggle span:nth-child(2) { opacity: 0; }
+    .menu-open .mobile-toggle span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
+
+    .main-window {
+        height: calc(100vh - var(--header-height));
+    }
+}

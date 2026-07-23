@@ -1,0 +1,52 @@
+<h3>Settings Help</h3>
+
+<h4>Change Password</h4>
+<p>This allows you to update your administrative access credentials. Your password is secured using industry-standard <strong>Argon2id</strong> hashing, bound to your hardware's unique signature and a secret system pepper.</p>
+<ul>
+    <li><strong>Old Password:</strong> Required to verify your current identity.</li>
+    <li><strong>New Password:</strong> Must be between 3 and 25 characters.</li>
+</ul>
+<p><strong>Note:</strong> Changing your password will instantly invalidate all other active sessions for security.</p>
+
+<h4>Background Music</h4>
+<p>Transform your captive portal into a live radio experience. This feature streams music to your customers' browsers with synchronized machine-specific timelines.</p>
+<ul>
+    <li><strong>Radio Off:</strong> Disables all background audio.</li>
+    <li><strong>Use Preset Radio:</strong> Streams default system tracks from the internal library.</li>
+    <li><strong>Use Custom Files:</strong> Streams high-fidelity <code>.mp3</code> files uploaded by the administrator.</li>
+</ul>
+
+<div style="background: #fffaf0; border-left: 5px solid #dd6b20; padding: 15px; margin: 20px 0; border-radius: 4px;">
+    <h5 style="color: #9c4221; margin-top: 0;"><i class="fas fa-music"></i> Streaming Optimization</h5>
+    <p>To avoid glitches, skips, or synchronization drifts, follow these technical standards:</p>
+    <ul>
+        <li><strong>Format:</strong> Strictly use <strong>MP3</strong>. Avoid M4A/AAC as they require full container parsing before seeking.</li>
+        <li><strong>Bitrate:</strong> Recommended <strong>128k to 192k</strong>. Higher bitrates may cause buffering on weak client signals, while lower bitrates may sound distorted.</li>
+    </ul>
+    
+    <p><strong>Recommended Download Command:</strong> Use <code>yt-dlp</code> for professional-grade conversion and metadata embedding:</p>
+    <code style="display: block; background: #2d3748; color: #fff; padding: 10px; border-radius: 4px; font-size: 0.8rem; overflow-x: auto; white-space: pre-wrap;">yt-dlp -vU -f bestaudio --extract-audio --audio-format mp3 --audio-quality 192K --embed-metadata --ffmpeg-location /usr/bin YOUTUBE_URL</code>
+</div>
+
+<hr>
+
+<h4>Admin Restriction</h4>
+<p>A second layer of security for your dashboard. This restricts who can even see the login screen based on their hardware MAC address.</p>
+<ul>
+    <li><strong>Open Access:</strong> Any device on the network can attempt to log in.</li>
+    <li><strong>Restricted:</strong> Only devices in your <strong>Whitelist</strong> can access the <code>/admin</code> directory. All others will be redirected to an "Access Denied" barrier.</li>
+</ul>
+<p><strong>Pro Tip:</strong> Always add your current device to the whitelist BEFORE enabling Restricted mode to prevent accidental lockout.</p>
+
+<div style="background: #fff5f5; border-left: 5px solid #e53e3e; padding: 15px; margin: 20px 0; border-radius: 4px;">
+    <h4 style="color: #c53030; margin-top: 0;"><i class="fas fa-shield-virus"></i> Critical Warning: Admin Compromise</h4>
+    <p>Unauthorized access to the dashboard is the primary vector for system-wide compromise. If an attacker gains entry, they can dismantle your entire security perimeter:</p>
+    <ul>
+        <li><strong>Security Bypass:</strong> An attacker can disable <strong>Admin Restrictions</strong> and <strong>SSH Gates</strong>, leaving the system permanently open to remote scanners and botnets.</li>
+        <li><strong>Logic Poisoning:</strong> Through the dashboard, logic modules can be manipulated to create permanent "FreeNet" backdoors for specific devices, bypassing the vending algorithm entirely.</li>
+        <li><strong>Credential Exposure:</strong> Access to the settings allows for the modification of authentication parameters, potentially leading to a persistent loss of control over the hardware.</li>
+    </ul>
+    <p><strong>The Importance of Admin Restriction:</strong> MAC-based whitelisting is your strongest defense. It ensures that even if your password is stolen, the dashboard remains invisible and inaccessible to unauthorized hardware. This "Dual-Gate" approach is essential for a production distro.</p>
+    
+    <p style="border-top: 1px solid #feb2b2; padding-top: 10px; margin-top: 15px; font-size: 0.85rem;">The strict security architecture of this system is directly informed by the developer's background in investigating vulnerabilities and creating exploits for targeted brands. By utilizing this practical experience in how systems are compromised, the developer has implemented defense layers designed to stop even the most persistent "bypass" tools found in the wild.</p>
+</div>

@@ -1,0 +1,4 @@
+{
+  "/opt/malicious.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file1.txt",
+  "/usr/malicious.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file2.txt"
+}

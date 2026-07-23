@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | SILVASYSTEMS</title>
+    <link rel="stylesheet" href="/css/pico.min.css">
+    <style>
+        :root { --primary: #ff6600; }
+        body { 
+            padding: 0; margin: 0; 
+            background-color: #f8fafc; 
+            min-height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-family: system-ui, -apple-system, sans-serif; 
+        }
+        .about-card {
+            text-align: center;
+            background: #fff;
+            padding: 3.5rem;
+            border-radius: 24px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.04);
+            border-top: 6px solid #ff6600;
+            max-width: 650px;
+            width: 95%;
+        }
+        h1 {
+            margin: 0;
+            color: #ff6600;
+            font-weight: 950;
+            letter-spacing: 3px;
+            font-size: 3rem;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+        h2 {
+            margin: 5px 0 0 0;
+            color: #1a202c;
+            font-weight: 800;
+            letter-spacing: 1px;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+        }
+        .mission {
+            color: #4a5568;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 25px;
+        }
+        .attribution {
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 800;
+        }
+        .heritage-box {
+            margin-top: 40px;
+            padding-top: 25px;
+            border-top: 1px solid #edf2f7;
+            font-size: 0.95rem;
+            color: #4a5568;
+        }
+        .heritage-link {
+            display: block;
+            margin-top: 10px;
+            color: #ff6600;
+            text-decoration: none;
+            font-weight: 700;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+        .heritage-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="about-card">
+        <h1>SILVASYSTEMS</h1>
+        <h2>Orange WiFi</h2>
+        
+        <p class="mission">The one and only free (as in 100% free) Wi-Fi Vendo Software for Single Board Computers</p>
+        <div class="attribution">by Colton Silva</div>
+
+        <div class="heritage-box">
+            Orange-WiFi is a reworked and improved version of <b>foswvs</b>, 
+            a free and open source WiFi vendo software.
+            <a href="https://github.com/foswvs/foswvs" target="_blank" class="heritage-link">https://github.com/foswvs/foswvs</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Center</title>
+    <link rel="stylesheet" href="/css/pico.min.css">
+    <style>
+        :root { --primary: #ff6600; }
+        body { padding: 20px; background-color: #f8fafc; min-height: 100vh; font-family: system-ui, -apple-system, sans-serif; }
+        
+        .header-box { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 3px solid #ff6600; padding-bottom: 15px; }
+        .header-box h2 { margin: 0; color: #1a202c; text-transform: uppercase; font-weight: 900; letter-spacing: 1px; }
+
+        .help-nav { margin-bottom: 25px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .help-nav button { 
+            width: auto; font-size: 0.75rem; padding: 8px 15px; font-weight: 800; 
+            text-transform: uppercase; border-radius: 10px; border: none; 
+            background: #1a202c; color: white; cursor: pointer;
+        }
+        .help-nav button:hover { background: #4a5568; }
+        .help-nav button.active { background: #ff6600 !important; }
+
+        .help-container {
+            background: #fff;
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid #edf2f7;
+        }
+    </style>
+    <script src="security_check.js"></script>
+</head>
+<body>
+    <main>
+        <div class="header-box">
+            <h2>Help Center</h2>
+        </div>
+        
+        <div class="help-nav" id="nav-group">
+            <button onclick="loadHelp('welcome', this)">Welcome</button>
+            <button onclick="loadHelp('requirements', this)">System Requirements</button>
+            <button onclick="loadHelp('ssh_help', this)">SSH Access</button>
+            <button onclick="loadHelp('net_help', this)">Networking</button>
+            <button onclick="loadHelp('syslogs_help', this)">System Logs</button>
+            <button onclick="loadHelp('id_help', this)">Orange Star ID</button>
+            <button onclick="loadHelp('shuffling_help', this)">Identity Rotation</button>
+            <button onclick="loadHelp('settings_help', this)">Settings</button>
+            <button onclick="loadHelp('portal_help', this)">Portal Design</button>
+            <button onclick="loadHelp('action_help', this)">Actions</button>
+            <button onclick="loadHelp('troubleshooting', this)" id="btn-trouble">Troubleshooting</button>
+        </div>
+
+        <div class="help-container" id="help-content">
+            <p>Select a topic above to view instructions.</p>
+        </div>
+    </main>
+
+    <script>
+        function loadHelp(page, btn = null) {
+            const container = document.getElementById('help-content');
+            
+            if(btn) {
+                const btns = document.querySelectorAll('#nav-group button');
+                btns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+
+            container.innerHTML = '<progress indeterminate></progress>';
+            
+            fetch('../../docs/' + page + '.html')
+                .then(r => {
+                    if(!r.ok) throw new Error("Documentation not found");
+                    return r.text();
+                })
+                .then(html => {
+                    container.innerHTML = html;
+                })
+                .catch(e => {
+                    container.innerHTML = '<p style="color:red">Error: ' + e.message + '</p>';
+                });
+        }
+
+        // Handle URL parameters like help.html?topic=ssh_help
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const topic = urlParams.get('topic') || 'welcome';
+            
+            const btns = document.querySelectorAll('#nav-group button');
+            let targetBtn = btns[0];
+            btns.forEach(b => {
+                if(b.getAttribute('onclick').includes(topic)) targetBtn = b;
+            });
+            
+            loadHelp(topic, targetBtn);
+        };
+    </script>
+</body>
+</html>

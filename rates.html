@@ -1,71 +1,158 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-<title>Rates</title>
-<link href="/css/pico.min.css" rel="stylesheet">
-<style>
-@font-face {
-  font-family: 'font7';
-  src: url('/fonts/Shadow-7WdR.ttf') format('truetype');
-}
-center{color:#ccc;}
-.r{font-family:font7;font-size:1.8em;color:red;text-align:center;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WiFi Rates | SILVASYSTEMS</title>
+    <link rel="stylesheet" href="/css/pico.min.css">
+    <style>
+        :root { --primary: #ff6600; }
+        body {
+            background-color: #f3f4f6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 2.5rem;
+            border-radius: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2);
+            width: 95%;
+            max-width: 450px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .header h2 { margin: 0; color: #ff6600; font-weight: 950; text-transform: uppercase; letter-spacing: 3px; font-size: 2rem; }
+        .header p { font-size: 0.75rem; color: #64748b; margin-bottom: 2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .rates-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 2rem; }
+        .rate-item {
+            background: rgba(255, 255, 255, 0.5);
+            padding: 1.2rem 1.5rem;
+            border-radius: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 102, 0, 0.1);
+        }
+        
+        .price-tag { font-size: 1.5rem; font-weight: 950; color: #1e293b; font-family: monospace; }
+        .val-badge { font-weight: 900; color: #ff6600; background: #fff5f0; padding: 6px 16px; border-radius: 10px; font-size: 1.1rem; border: 1px solid rgba(255, 102, 0, 0.15); }
+        
+        .no-exp { background: #1a202c; color: #fff; padding: 12px; border-radius: 12px; font-weight: 900; text-transform: uppercase; font-size: 0.8rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 10px; letter-spacing: 1px; }
+        
+        .main-btn {
+            width: 100%; background: #ff6600; border: none; color: white; font-weight: 900; padding: 1rem; border-radius: 1rem; text-transform: uppercase; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        svg { fill: currentColor; width: 20px; height: 20px; }
+    </style>
 </head>
 <body>
-<main class="container">
-  <article style="margin-top:0 !important;margin-bottom:1em !important;">
-    <div class="r" style="font-size:3em;">WiFi RATES</div>
-    <center>may change anytime w/o prior notice</center>
-    <hr/>
-    <div id="rates"></div>
-    <hr/>
-    <div class="r" style="font-size:2em;">NO EXPIRATION!</div>
-  </article>
-  <button class="primary" onclick="location.assign('/')" type="button">MAIN PORTAL</button>
-</main>
-<script>
-const x = new XMLHttpRequest(),
-      d = document.getElementById('rates'),
-      p = new Intl.NumberFormat('en-PH', { style:'currency', currency:'PHP' });
 
-document.addEventListener('DOMContentLoaded',()=>{
-  x.addEventListener('readystatechange',()=>{
-    if( x.readyState === 4 ) {
-      if( x.status === 200 ) {
-        let rates = JSON.parse(x.responseText);
+    <div class="glass-card">
+        <div class="header">
+            <h2>WIFI RATES</h2>
+            <p>Reliable Internet Access</p>
+        </div>
 
-        for(k in rates) {
-          let s =document.createElement('div');
-          s.innerHTML = `${p.format(k)} = ${format_mb(rates[k])}`;
-          s.className = 'r';
-          d.appendChild(s);
+        <div id="rates-container" class="rates-grid">
+            <div style="padding: 20px;"><progress indeterminate></progress></div>
+        </div>
+
+        <div class="no-exp">
+            <svg viewBox="0 0 24 24"><path d="M18.6 6.62c-1.44 0-2.8.56-3.77 1.58L12 11.66 9.17 8.2c-.97-1.02-2.33-1.58-3.77-1.58-2.97 0-5.4 2.41-5.4 5.38s2.43 5.38 5.4 5.38c1.44 0 2.8-.56 3.77-1.58L12 12.34l2.83 3.46c.97 1.02 2.33 1.58 3.77 1.58 2.97 0 5.4-2.41 5.4-5.38s-2.43-5.38-5.4-5.38zm0 8.76c-.94 0-1.84-.37-2.52-1.04L12 10.32l-4.08 4.02c-.68.67-1.58 1.04-2.52 1.04-1.91 0-3.47-1.54-3.47-3.38s1.56-3.38 3.47-3.38c.94 0 1.84.37 2.52 1.04L12 13.68l4.08-4.02c.68-.67 1.58-1.04 2.52-1.04 1.91 0 3.47 1.54 3.47 3.38s-1.56 3.38-3.47 3.38z"/></svg>
+            NO EXPIRATION!
+        </div>
+
+        <button class="main-btn" onclick="location.assign('/')">
+            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            BACK TO PORTAL
+        </button>
+    </div>
+
+    <script>
+        // --- PORTAL DESIGN ENGINE ---
+        (function() {
+            fetch('/css/img/design.json?v=' + Date.now()).then(r => r.json()).then(design => {
+                if (design.background) {
+                    const img = new Image(); img.src = design.background;
+                    img.onload = () => {
+                        document.body.style.backgroundImage = 'url(' + design.background + ')';
+                        document.body.style.backgroundSize = 'cover';
+                        document.body.style.backgroundPosition = 'center';
+                        document.body.style.backgroundAttachment = 'fixed';
+                    };
+                }
+                if (design.font) {
+                    const s = document.createElement('style');
+                    s.innerHTML = `@font-face { font-family: 'PFont'; src: url('/fonts/${design.font}'); font-display: swap; } body { font-family: 'PFont', sans-serif !important; } .header h2 { font-family: inherit !important; }`;
+                    document.head.appendChild(s);
+                }
+            }).catch(() => {});
+        })();
+
+        const container = document.getElementById('rates-container');
+        const peso = new Intl.NumberFormat('en-PH', { style:'currency', currency:'PHP' });
+
+        function format_mb(size) {
+            size = parseFloat(size) || 0;
+            if(size < 1) return '0MB';
+            let base = Math.floor(Math.log(size) / Math.log(1024));
+            let unit = ['MB','GB','TB','PB'];
+            let val = size / Math.pow(1024, base);
+            return (Number.isInteger(val) ? val : val.toFixed(1)) + unit[base];
         }
-      }
-    }
-  });
 
-  x.open('GET','/conf/rates.json?_=' + Date.now());
-  x.send();
-});
+        function loadRates() {
+            fetch('/rates_list.json?v=' + Date.now())
+                .then(r => r.json())
+                .then(data => {
+                    container.innerHTML = '';
+                    
+                    // Authoritative dual-mode detection
+                    const mode = (data.settings && data.settings.display) ? data.settings.display : 'data';
+                    const rates = data.rates || {};
+                    const entries = Object.keys(rates);
+                    
+                    if (entries.length === 0) {
+                        container.innerHTML = '<p>Pricing currently offline.</p>';
+                        return;
+                    }
 
-function format_mb(size) {
-  size = parseFloat(size) || 0;
+                    entries.sort((a,b) => parseInt(a) - parseInt(b)).forEach(price => {
+                        const val = rates[price];
+                        let displayVal = "";
+                        
+                        if (typeof val === 'object') {
+                            displayVal = (mode === 'data') ? format_mb(val.mb) : val.time;
+                        } else {
+                            displayVal = format_mb(val);
+                        }
+                        
+                        const div = document.createElement('div');
+                        div.className = 'rate-item';
+                        div.innerHTML = `
+                            <div class="price-tag">${peso.format(price)}</div>
+                            <div class="val-badge">${displayVal}</div>
+                        `;
+                        container.appendChild(div);
+                    });
+                })
+                .catch(() => { 
+                    container.innerHTML = '<p style="color:red">Synchronization Error</p>';
+                });
+        }
 
-  if( size<1 ) return '0MB';
-
-  let base = Math.floor(Math.log(size) / Math.log(1024));
-  let unit = ['MB','GB','TB','PB','EB','ZB','YB'];
-
-  size = size / Math.pow(1024, base);
-  size = Number.isInteger(size) ? size : size.toFixed(2);
-
-  return size + unit[base];
-}
-</script>
+        loadRates();
+    </script>
 </body>
 </html>

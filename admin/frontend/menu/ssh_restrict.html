@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSH Restriction</title>
+    <link rel="stylesheet" href="/css/pico.min.css">
+    <style>
+        body { padding: 20px; }
+        .control-panel { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #eee; }
+        .status-badge { display: inline-block; padding: 5px 10px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; }
+        .status-enabled { background: #d1fae5; color: #065f46; }
+        .status-restricted { background: #fee2e2; color: #991b1b; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
+        .del-btn { background: #ef4444; color: white; border: none; padding: 5px 10px; font-size: 0.8rem; cursor: pointer; border-radius: 4px; }
+    </style>
+    <script src="security_check.js"></script>
+</head>
+<body>
+    <h2>SSH Access Control</h2>
+    
+    <div class="control-panel">
+        <label for="ssh-toggle"><strong>SSH Access Mode:</strong></label>
+        <div style="display: flex; align-items: center; gap: 15px; margin-top: 10px;">
+            <label>
+                <input type="radio" name="mode" value="ENABLED" onchange="updateMode('ENABLED')"> 
+                Open to All
+            </label>
+            <label>
+                <input type="radio" name="mode" value="RESTRICTED" onchange="updateMode('RESTRICTED')"> 
+                Whitelist Only
+            </label>
+        </div>
+        <div id="current-status" style="margin-top: 15px;">Status: Loading...</div>
+    </div>
+
+    <div class="control-panel" id="whitelist-panel" style="display: none;">
+        <h4>Allowed Devices (Whitelist)</h4>
+        <div style="display: flex; gap: 10px;">
+            <input type="text" id="new-mac" placeholder="AA:BB:CC:DD:EE:FF" style="margin-bottom: 0;">
+            <button onclick="addMac()" style="width: auto; margin-bottom: 0;">Add MAC</button>
+            <button class="secondary outline" onclick="addCurrentDevice()" style="width: auto; margin-bottom: 0;">Add Current Device</button>
+        </div>
+        <table>
+            <thead><tr><th>MAC Address</th><th>Action</th></tr></thead>
+            <tbody id="mac-list"></tbody>
+        </table>
+    </div>
+
+    <script>
+        let myMac = '';
+
+        function loadData() {
+            // Get current device info
+            fetch('/api/my_info.php').then(r => r.json()).then(d => {
+                myMac = d.mac;
+                const statusDiv = document.getElementById('current-status');
+                // We'll update the display text later in the main fetch
+            });
+
+            fetch('../../shell_exec/ssh_restrict.php')
+                .then(r => r.json())
+                .then(data => {
+                    // Update Radios
+                    document.querySelector(`input[value="${data.status}"]`).checked = true;
+                    
+                    // Update Status Text
+                    const statusDiv = document.getElementById('current-status');
+                    if (data.status === 'ENABLED') {
+                        statusDiv.innerHTML = '<span class="status-badge status-enabled">OPEN ACCESS</span>';
+                        document.getElementById('whitelist-panel').style.display = 'none';
+                    } else {
+                        statusDiv.innerHTML = '<span class="status-badge status-restricted">RESTRICTED MODE</span>';
+                        document.getElementById('whitelist-panel').style.display = 'block';
+                    }
+
+                    // Update Table
+                    const tbody = document.getElementById('mac-list');
+                    tbody.innerHTML = '';
+                    data.whitelist.forEach(mac => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${mac}</td>
+                                <td><button class="del-btn" onclick="delMac('${mac}')">Remove</button></td>
+                            </tr>`;
+                    });
+                });
+        }
+
+        function updateMode(mode) {
+            if (!confirm(`Are you sure you want to switch SSH to ${mode}?`)) { loadData(); return; }
+            postData({ action: 'set_status', status: mode });
+        }
+
+        function addMac() {
+            const mac = document.getElementById('new-mac').value;
+            postData({ action: 'add_mac', mac: mac });
+            document.getElementById('new-mac').value = '';
+        }
+
+        function addCurrentDevice() {
+            if (myMac && myMac !== 'Unknown') {
+                postData({ action: 'add_mac', mac: myMac });
+            } else {
+                alert("Failed to detect your MAC address. Please enter it manually.");
+            }
+        }
+
+        function delMac(mac) {
+            if (confirm("Block this device?")) {
+                postData({ action: 'del_mac', mac: mac });
+            }
+        }
+
+        function postData(payload) {
+            fetch('../../shell_exec/ssh_restrict.php', {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            }).then(() => loadData());
+        }
+
+        loadData();
+    </script>
+</body>
+</html>

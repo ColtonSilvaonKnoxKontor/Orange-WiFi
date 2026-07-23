@@ -1,17 +1,35 @@
 #!/bin/bash
-APPDIR=/home/pi/foswvs
+# [!] By Colton Silva (chinawaterstealers).
+# SilvaSystems Secure Network Initializer
+APPDIR=/home/pi/orange-wifi
 
-sudo cp $APPDIR/conf/dhcpd.conf /etc/dhcp/dhcpd.conf
-sudo cp $APPDIR/conf/nginx.conf /etc/nginx/nginx.conf
-sudo cp $APPDIR/conf/interfaces /etc/network/interfaces
+# 1. Kill any existing watchdog processes to prevent overlapping loops
+sudo pkill -f clients
 
-sudo iptables-restore < $APPDIR/conf/iptables.txt
+# 2. Disable IPv6 (The Bypass Killer)
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
 
-if [[ $(cat /proc/sys/net/ipv4/ip_forward) == 0 ]]; then
-  sudo sysctl net.ipv4.ip_forward=1
-fi
+# 3. Firewall Reset
+sudo iptables -F
+sudo iptables -X
+sudo iptables -t nat -F
+sudo iptables -t nat -X
+sudo iptables -P FORWARD DROP
 
-while true
-do
-  $APPDIR/api/clients > /dev/null
-done
+# 4. Base NAT
+sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+# 5. DNS Hijacking
+sudo iptables -t nat -A PREROUTING -i eth1 -p udp --dport 53 -j REDIRECT --to-ports 53
+sudo iptables -t nat -A PREROUTING -i eth1 -p tcp --dport 53 -j REDIRECT --to-ports 53
+
+# 6. HTTP Redirection (FIXED SYNTAX)
+# Redirect all Port 80 traffic NOT destined for the gateway to the portal
+sudo iptables -t nat -A PREROUTING -i eth1 -p tcp --dport 80 ! -d 10.0.0.1 -j DNAT --to-destination 10.0.0.1:80
+
+# 7. Global Blocks
+sudo iptables -A FORWARD -p tcp --dport 853 -j REJECT
+
+# 8. Start Watchdog in background
+nohup $APPDIR/api/clients > /dev/null 2>&1 &

@@ -1,0 +1,119 @@
+<h3>Networking Help</h3>
+
+<h4>DoS Defense</h4>
+<p>Manage real-time mitigations against common Denial of Service (DoS) attack vectors to ensure the stability of the Orange WiFi distribution.</p>
+<ul>
+    <li><strong>SYN Flood Protection:</strong> Mitigates TCP handshake exhaustion by enabling kernel-level SYN Cookies and enforcing aggressive firewall-level connection limits.</li>
+    <li><strong>ICMP Flood Protection:</strong> Rate-limits incoming Ping requests (1 per second) to prevent network saturation and CPU overhead from ICMP-based attacks.</li>
+    <li><strong>HTTP Flood Protection:</strong> A hybrid Layer 4 and Layer 7 defense that throttles rapid-fire HTTP requests and breaks persistent connections based on your defined threshold.</li>
+</ul>
+
+<div style="background: #f8fafc; border: 1px solid #ff6600; padding: 20px; border-radius: 12px; margin: 20px 0;">
+    <h5 style="color: #ff6600; margin-bottom: 10px; font-weight: 800; text-transform: uppercase; font-size: 0.85rem;">DoS DETECTION TIPS</h5>
+    <p style="font-size: 0.85rem; color: #4a5568;">Monitor these system areas to identify and verify the interception of active attacks:</p>
+    <ul style="font-size: 0.85rem; color: #4a5568; margin-top: 10px;">
+        <li><strong>Kernel Log:</strong> Check for <code>[ORANGE-WIFI-ICMP-BLOCK]</code> or <code>Possible SYN flooding</code> messages indicating hardware-level mitigation.</li>
+        <li><strong>Network Throughput:</strong> Observe the <strong>Overview</strong> dashboard for sudden, unexplained spikes in packet frequency without corresponding traffic.</li>
+        <li><strong>Web Access Log:</strong> High-frequency repeated requests from a single IP (e.g., thousands of hits per second) indicate a Layer 7 HTTP flood.</li>
+    </ul>
+</div>
+
+<hr>
+
+<h4>Network Information</h4>
+<p>Displays the detailed configuration of all physical and virtual network interfaces on the Orange Pi.</p>
+<ul>
+    <li><strong>eth0:</strong> The WAN/Internet interface (usually connected to your router).</li>
+    <li><strong>eth1:</strong> The LAN/Client interface (where your WiFi AP is connected).</li>
+    <li><strong>lo:</strong> Local loopback interface.</li>
+</ul>
+
+<hr>
+
+<h4>Web Access Log</h4>
+<p>Displays every HTTP request processed by the system. Use this to audit client portal visits and identify suspicious web activity.</p>
+
+<div style="background: #f8fafc; border: 1px solid #ff6600; padding: 20px; border-radius: 12px; margin-top: 15px;">
+    <h5 style="color: #ff6600; margin-bottom: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">CYBERSECURITY TIPS</h5>
+    <p style="font-size: 0.85rem; line-height: 1.4; margin-bottom: 20px;">Audit the Access Log for these signatures of automated hacking tools (Kali/Parrot OS, Termux, NetHunter, or Exploit Software):</p>
+    
+    <div style="font-size: 0.85rem; margin-bottom: 25px;">
+        <ul style="padding-left: 20px; color: #4a5568;">
+            <li style="margin-bottom: 15px;">
+                <strong>Network Scanning & Discovery (nmap, ffuf):</strong> Attackers use Nmap to probe services and tools like ffuf to scan for hidden paths. Look for "Nmap Scripting Engine" or empty User-Agents ("-").
+                <div style="background: #1a202c; color: #4ade80; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 0.7rem; margin-top: 8px; border-left: 4px solid #e53e3e;">
+                    [RECON: Nmap Scripting Engine]<br>
+                    10.0.0.11 - [07/Mar/2026] "GET /nmaplowercheck..." 302 ... "Nmap Scripting Engine"<br><br>
+                    [RECON: Empty User-Agent Probe]<br>
+                    10.0.0.11 - [07/Mar/2026] "GET /" 302 0 "-" "-"<br><br>
+                    [ATTACK: Fuzz Faster U Fool]<br>
+                    192.168.100.62 - [07/Mar/2026] "GET /admin/critical/zope" 200 ... "Fuzz Faster U Fool"
+                </div>
+            </li>
+
+            <li style="margin-bottom: 15px;">
+                <strong>Exploit Frameworks:</strong> User-Agents containing "Metasploit", "Nikto", or "BeEF" indicate active vulnerability scanning or exploit attempts.
+            </li>
+
+            <li style="margin-bottom: 15px;">
+                <strong>Mobile Hacking (Termux/NetHunter):</strong> Attacks from mobile devices often reveal themselves through "Python-requests", "libcurl", or specific Termux-related strings in the environment headers if not carefully spoofed.
+            </li>
+
+            <li style="margin-bottom: 15px;">
+                <strong>SQL Injection:</strong> Look for "sqlmap" or long URLs containing single quotes ('), <code>UNION</code>, or <code>SELECT</code>.
+            </li>
+
+            <li style="margin-bottom: 15px;">
+                <strong>Brute-Force Attacks:</strong> Attackers use automated tools to guess your password. Often, they idiotically forget to spoof their identity, revealing library agents like "python-requests" in the log.
+                <div style="background: #1a202c; color: #4ade80; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 0.7rem; margin-top: 8px; border-left: 4px solid #e53e3e;">
+                    [ATTACK: Brute-Force Probing]<br>
+                    192.168.100.16 - [08/Mar/2026] "PUT /admin/pass.php" 401 ... "python-requests/2.32.3"
+                </div>
+            </li>
+
+            <li style="margin-bottom: 15px;">
+                <strong>Directory Traversal & Information Disclosure:</strong> Attackers use <code>../</code> to probe for system files or monitor APIs for internal path disclosures. Look for recursive traversal sequences or anomalous 200 OK responses on API probes.
+                <div style="background: #1a202c; color: #4ade80; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 0.7rem; margin-top: 8px; border-left: 4px solid #e53e3e;">
+                    [ATTACK: Adventurous Traversal Probing]<br>
+                    192.168.100.62 - [07/Mar/2026] "GET /admin/amusement/api.php?track=../../../../etc/passwd" 200 ... "curl/8.18.0"<br><br>
+                    [VULNERABILITY: Internal Path Disclosure]<br>
+                    {"status":"playing","track":"../custom_radio/OHNOOHYESfeat.mp3"}
+                </div>
+            </li>
+
+            <li style="margin-bottom: 15px;">
+                <strong>Anomalous Agents:</strong> High-frequency requests using "curl" or "Python-requests" are often mindless malicious scripts. Genuine human traffic reveals a full browser agent.
+                <div style="background: #1a202c; color: #4ade80; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 0.7rem; margin-top: 8px; border-left: 4px solid #e53e3e;">
+                    [ATTACK: Mindless Curl Traffic]<br>
+                    192.168.100.62 - [07/Mar/2026] "PUT /admin/pass.php" 401 ... "curl/8.18.0"
+                </div>
+            </li>
+
+            <li style="margin-bottom: 15px;">
+                <strong>Masquerading Bots:</strong> Be alert for generic strings like <code>Mozilla/5.0</code> without version details, or unusually old browser versions used to bypass filters.
+                <div style="background: #1a202c; color: #4ade80; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 0.7rem; margin-top: 8px; border-left: 4px solid #dd6b20;">
+                    [MASQUERADE: Fake Browser Agent]<br>
+                    192.168.100.62 - [07/Mar/2026] "GET /admin/Login" 200 ... "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+                </div>
+            </li>
+
+            <li>
+                <strong>Legitimate Traffic:</strong> Human browsers reveal full versioning details and standard HTTP referrers.
+                <div style="background: #1a202c; color: #4ade80; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 0.7rem; margin-top: 8px; border-left: 4px solid #4ade80;">
+                    [TRUSTED: Standard Browser]<br>
+                    192.168.100.62 - [07/Mar/2026] "HEAD /admin/pass.php" 200 ... "Firefox/140.0"
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<hr>
+
+<h4>Web Error Log</h4>
+<p>Displays PHP and Nginx system errors. If the dashboard or portal crashes, check here for the specific error message to troubleshoot.</p>
+
+<hr>
+
+<h4>iptables NAT</h4>
+<p>Shows the active Network Address Translation (NAT) rules in the Linux kernel. This confirms that traffic is being correctly redirected to the captive portal and masqueraded for internet access.</p>

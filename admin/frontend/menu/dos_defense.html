@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DoS Defense</title>
+    <link rel="stylesheet" href="/css/pico.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #ff6600; }
+        body { padding: 20px; background-color: #f8fafc; min-height: 100vh; font-family: system-ui, -apple-system, sans-serif; }
+        
+        .header-box { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 3px solid #ff6600; padding-bottom: 15px; }
+        .header-box h2 { margin: 0; color: #1a202c; text-transform: uppercase; font-weight: 900; letter-spacing: 1px; }
+
+        .card { background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; border: 1px solid #f1f5f9; }
+        .card h5 { margin-bottom: 15px; color: #4a5568; font-weight: 800; text-transform: uppercase; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; }
+        .card p { font-size: 0.85rem; color: #64748b; margin-bottom: 20px; font-weight: 600; }
+
+        /* PROFESSIONAL TOGGLE */
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e0; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #ff6600; }
+        input:checked + .slider:before { transform: translateX(24px); }
+
+        .defense-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0; }
+        
+        .status-box { background: #0f172a; color: #4ade80; padding: 15px; border-radius: 10px; font-family: monospace; font-size: 0.8rem; margin-top: 25px; min-height: 100px; overflow-y: auto; border: 1px solid #1e293b; text-align: left; white-space: pre-wrap; }
+    </style>
+    <script src="security_check.js"></script>
+</head>
+<body>
+    <main>
+        <div class="header-box">
+            <h2>DoS Defense</h2>
+        </div>
+
+        <div class="card">
+            <h5><i class="fas fa-shield-virus"></i> Network Flood Protection</h5>
+            <p>Mitigate high-frequency connection attempts and protocol-specific attacks.</p>
+
+            <div class="defense-item">
+                <div>
+                    <strong style="display:block; color: #1a202c;">SYN Flood Protection</strong>
+                    <span style="font-size: 0.75rem; color: #64748b;">Prevents TCP connection exhaustion using SYN Cookies.</span>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="syn-toggle" onchange="toggleDefense('syn')">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="defense-item" style="margin-top: 15px; display: block;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div>
+                        <strong style="display:block; color: #1a202c;">HTTP Flood Protection</strong>
+                        <span style="font-size: 0.75rem; color: #64748b;">Enforces Layer 4 & Layer 7 throttling to mitigate request floods.</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="http_flood-toggle" onchange="toggleDefense('http_flood')">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div id="keepalive-config" style="padding-top: 10px; border-top: 1px dashed #e2e8f0; display: none;">
+                    <label style="font-size: 0.75rem; font-weight: 800; color: #4a5568;">Keep-Alive Requests (Threshold):</label>
+                    <div class="input-area" style="display: flex; gap: 10px; margin-top: 5px;">
+                        <input type="number" id="keepalive-val" value="5" style="margin-bottom: 0; padding: 5px 10px; font-size: 0.8rem; border-radius: 8px;">
+                        <button class="gen-btn" style="margin-top: 0; padding: 5px 15px; width: auto; font-size: 0.7rem;" onclick="applyKeepalive()">Update Limit</button>
+                    </div>
+                    <span style="font-size: 0.65rem; color: #718096;">Lower values (e.g. 1-5) provide more aggressive protection.</span>
+                </div>
+            </div>
+            <div class="defense-item" style="margin-top: 15px;">
+                <div>
+                    <strong style="display:block; color: #1a202c;">ICMP Flood Protection</strong>
+                    <span style="font-size: 0.75rem; color: #64748b;">Rate-limits incoming Pings (1/sec) to mitigate ICMP-based DoS.</span>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="icmp-toggle" onchange="toggleDefense('icmp')">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div id="log" class="status-box">System ready. Protection state synchronized.</div>
+    </main>
+
+    <script>
+        function loadState() {
+            fetch('../../management/dos_api.php?action=get')
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('syn-toggle').checked = (data.syn === '1');
+                    document.getElementById('icmp-toggle').checked = (data.icmp === '1');
+                    document.getElementById('http_flood-toggle').checked = (data.http === '1');
+                    document.getElementById('keepalive-config').style.display = (data.http === '1') ? 'block' : 'none';
+                    if (data.keepalive) document.getElementById('keepalive-val').value = data.keepalive;
+                });
+        }
+
+        function applyKeepalive() {
+            const val = document.getElementById('keepalive-val').value;
+            const log = document.getElementById('log');
+            log.innerHTML += `[INFO] Updating Keep-Alive request limit to: ${val}...\n`;
+
+            fetch('../../management/dos_api.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'update_keepalive', val: val })
+            })
+            .then(r => r.json())
+            .then(res => {
+                log.innerHTML += `[SUCCESS] ${res.msg}\n`;
+                log.scrollTop = log.scrollHeight;
+            });
+        }
+
+        function toggleDefense(type) {
+            const isEnabled = document.getElementById(type + '-toggle').checked;
+            const kaVal = document.getElementById('keepalive-val').value;
+            const log = document.getElementById('log');
+            
+            if (type === 'http_flood') {
+                document.getElementById('keepalive-config').style.display = isEnabled ? 'block' : 'none';
+            }
+
+            log.innerHTML += `[INFO] ${type.toUpperCase()} protection state changing to: ${isEnabled ? 'ACTIVE' : 'DISABLED'}...\n`;
+
+            fetch('../../management/dos_api.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'toggle', type: type, state: isEnabled ? '1' : '0', keepalive: kaVal })
+            })
+            .then(r => r.json())
+            .then(res => {
+                log.innerHTML += `[SUCCESS] ${res.msg}\n`;
+                log.scrollTop = log.scrollHeight;
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadState);
+    </script>
+</body>
+</html>

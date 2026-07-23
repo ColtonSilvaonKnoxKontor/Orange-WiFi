@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+<title>plugins</title>
+<link href="/css/pico.min.css" rel="stylesheet">
+<style>td,th{white-space:nowrap;}</style>
+<script src="../frontend/menu/security_check.js"></script>
+<script src="../frontend/menu/security_check.js"></script></head>
+<body>
+<main class="container">
+  <button onclick="window.top.location.reload();">Dashboard</button>
+  <figure>
+    <table id="devices">
+      <thead>
+        <tr><th>Name</th><th>Description</th><th>URL</th></tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </figure>
+  <progress indeterminate="true"></progress>
+  <button onclick="window.top.location.reload();">Dashboard</button>
+</main>
+<script src="/js/theme.js"></script>
+<script>
+function list_plugins() {
+  fetch('https://raw.githubusercontent.com/foswvs/plugins/main/latest.json')
+    .then((r)=>r.json())
+    .then((d)=> {
+      d.forEach((o)=>get_plugin(o));
+      document.getElementsByTagName('progress')[0].remove();
+    });
+}
+
+function get_plugin(o) {
+  fetch(o.url).then((r)=>r.json())
+    .then((d) => {
+      view_table(d,o.cmd);
+    });
+}
+
+function install_plugin() {
+  if( confirm('Confirm OK to install '+this.dataset.plugin) ) {
+    alert('plugin functionality is not ready. you can install it manually.');
+  }
+}
+
+function view_table(d,cmd) {
+  let table = document.getElementById('devices').getElementsByTagName('tbody')[0],
+        row = table.insertRow(-1),
+       col1 = row.insertCell(0),
+       col2 = row.insertCell(1),
+       col3 = row.insertCell(2),
+
+       txt1 = document.createTextNode(d.name),
+       txt2 = document.createTextNode(d.description),
+       txt3 = document.createTextNode(d.html_url);
+
+  row.dataset.cmd = cmd;
+  row.dataset.plugin = d.name;
+
+  row.addEventListener('click', install_plugin);
+
+  col1.appendChild(txt1);
+  col2.appendChild(txt2);
+  col3.appendChild(txt3);
+}
+
+function alert(txt) {
+  let d = document.createElement('div');
+  d.style.backgroundColor='red';
+  d.style.textAlign='center';
+  d.style.position='fixed';
+  d.style.padding='5px';
+  d.style.color='white';
+  d.style.bottom='0px';
+  d.style.right='0px';
+  d.style.left='0px';
+  d.innerHTML=txt;
+  document.body.appendChild(d);
+  setTimeout(()=>d.remove(),3000);
+}
+
+list_plugins();
+</script>
+</body>
+</html>

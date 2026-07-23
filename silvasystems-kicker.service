@@ -1,0 +1,13 @@
+[Unit]
+Description=SilvaSystems Conntrack Kicker Daemon
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /home/pi/orange-wifi/bin/conntrack_daemon.py
+Restart=always
+RestartSec=5
+User=root
+
+[Install]
+WantedBy=multi-user.target

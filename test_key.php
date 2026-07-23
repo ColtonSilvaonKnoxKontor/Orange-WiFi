@@ -1,0 +1,1 @@
+<?php echo "KEY_TEST_SUCCESS"; ?>

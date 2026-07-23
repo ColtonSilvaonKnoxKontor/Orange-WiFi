@@ -1,425 +1,425 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-<title>PisoWiFi</title>
-<style>
-@font-face {
-  font-family: 'font1';
-  src: url('/fonts/OtomanopeeOne-Regular.ttf') format('truetype');
-}
-@font-face {
-  font-family: 'font2';
-  src: url('/fonts/Orbitron-VariableFont_wght.ttf') format('truetype');
-}
-@font-face {
-  font-family: 'font3';
-  src: url('/fonts/Tourney-VariableFont_wdth,wght.ttf') format('truetype');
-}
-@font-face {
-  font-family: 'font4';
-  src: url('/fonts/AlfaSlabOne-Regular.ttf') format('truetype');
-}
-@font-face {
-  font-family: 'font5';
-  src: url('/fonts/LibreBarcode39Text-Regular.ttf') format('truetype');
-}
-@font-face {
-  font-family: 'font6';
-  src: url('/fonts/BungeeOutline-Regular.ttf') format('truetype');
-}
-@font-face {
-  font-family: 'font7';
-  src: url('/fonts/Shadow-7WdR.ttf') format('truetype');
-}
-
-body {
-  background-color: #fff;
-  color:#333333;
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-  line-height:1.42857143;
-}
-
-hr {
-  border:0;
-  border-top:1px solid #eee;
-}
-
-#btn {
-  background:#22aa22;
-  border:1px solid #55bb55;
-  border-radius:4px;
-  color:#fff;
-  cursor:pointer;
-  font-family: font2, sans-serif;
-  font-size:26px;
-  padding:10px 50px;
-  text-transform:uppercase;
-}
-
-#btn:hover {
-  background:#11bb11;
-}
-
-#mb{
-  display:none;
-  font-family: font3;
-  font-size:48px;
-  text-align:center;
-}
-
-#stat {
-  font-family: font4;
-  font-size:26px;
-  text-align:center;
-  text-transform:uppercase;
-}
-
-#slogan{
-  font-family:font5;
-  font-size:2em;
-  margin-top:0;
-}
-
-#title{
-  font-family:font6 !important;
-  font-size:3.6em;
-  font-weight:400;
-  margin:0;
-}
-
-#wait {
-  display:none;
-  font-family: font1, sans-serif;
-  font-size:18px;
-}
-
-.main {
-  margin:10px auto 0;
-  max-width:380px;
-  padding:10px 0 50px;
-  text-align:center;
-}
-ul {
-  padding:0;
-}
-ul li {
-  list-style:none;
-  font-size:1.2em;
-  padding:4px 0;
-}
-ul li a {
-  font-family:font1;
-  text-decoration:none;
-  background-color:#2e8baa;
-  color:white;
-  padding:2px 4px;
-  border-radius:3px;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piso WiFi</title>
+    <link rel="stylesheet" href="/css/pico.min.css">
+    <style>
+        body {
+            background-color: #f3f4f6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .view-toggle {
+            margin-bottom: 1rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.2);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        .view-toggle svg { fill: #fff; width: 24px; height: 24px; }
+        
+        .portal-card {
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            width: 95%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .portal-hidden { opacity: 0 !important; transform: translateY(20px); pointer-events: none; }
+        .brand { font-family: system-ui, -apple-system, sans-serif !important; font-size: 1.5rem; font-weight: 800; color: #ff6600; margin-bottom: 0.5rem; text-transform: uppercase; }
+        .status { font-size: 0.875rem; color: #6b7280; margin-bottom: 2rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background-color: #10b981; }
+        .status-dot.disconnected { background-color: #ef4444; }
+        .main-btn { width: 100%; padding: 1rem; font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; border-radius: 0.5rem; transition: transform 0.1s; }
+        .main-btn:active { transform: scale(0.98); }
+        .stats-row { display: flex; justify-content: space-between; background: #f9fafb; padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 1.5rem; font-size: 0.9rem; }
+        .stat-item strong { display: block; font-size: 1.1rem; color: #111827; }
+        .footer-links { display: flex; justify-content: center; gap: 1rem; font-size: 0.85rem; }
+        .footer-links a { color: #6b7280; text-decoration: none; }
+        button.primary { background-color: #ff6600 !important; border-color: #ff6600 !important; color: white !important; }
+        button.primary:hover { background-color: #e65c00 !important; border-color: #e65c00 !important; }
+    </style>
 </head>
 <body>
-<div class="main">
-  <h1 id="title">piso wifi</h1>
-  <p id="slogan">1 5 10</p>
-  <p id="wait">waiting for payment</p>
-  <p id="mb">0MB</p>
-  <button id="btn">Insert Coin</button>
-  <br><br>
-  <hr>
-  <h2 id="stat" style="font-size:14px;">CHECKING NETWORK STATUS</h2>
-  <div>Data Usage: <span id="mb_used">0</span>/<span id="mb_limit">0</span><span id="mb_free" style="display:none;">&nbsp;</span></div>
-  <div>MAC Address: <span id="mac_addr">Identifying...</span></div>
-  <div>IP Address: <span id="ip_addr">0.0.0.0</span></div>
-  <ul>
-    <li>
-      <a href="/rates.html">VIEW RATES</a>
-    </li>
-    <li>
-      <a href="/s.html">DATA SHARING</a>
-    </li>
-    <li>
-      <a href="/txn.html">VIEW TRANSACTIONS</a>
-    </li>
-  </ul>
-</div>
-<audio id="beep" src="/js/sfx/beep.mp3" preload="auto" loop></audio>
-<audio id="bump" src="/js/sfx/bump.wav" preload="auto" loop></audio>
-<audio id="coin" src="/js/sfx/coin.wav" preload="auto" loop></audio>
-<audio id="yeeh" src="/js/sfx/yeeh.mp3" preload="auto" loop></audio>
-<script>
-const beep = document.getElementById('beep'),
-      bump = document.getElementById('bump'),
-      coin = document.getElementById('coin'),
-       btn = document.getElementById('btn'),
-       mac = document.getElementById('mac_addr'),
-        ip = document.getElementById('ip_addr'),
-         f = document.getElementById('mb_free'),
-         u = document.getElementById('mb_used'),
-         l = document.getElementById('mb_limit'),
-         s = document.getElementById('stat'),
-         w = document.getElementById('wait'),
-         m = document.getElementById('mb');
 
-const peso = new Intl.NumberFormat('en-PH', {style: 'currency', currency: 'PHP'});
+    <div class="view-toggle" id="view-toggle" onclick="togglePortal()">
+        <svg id="toggle-icon" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+    </div>
 
-var new_coin = 0, mb_free = 0;
+    <div class="portal-card" id="portal-card">
+        <div class="brand">SILVASYSTEMS</div>
+        <div id="vendo-name" style="font-size: 0.9rem; font-weight: 600; color: #4b5563; margin-top: -0.5rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em;"></div>
+        
+        <!-- CUSTOM CUSTOMER MESSAGE -->
+        <div id="custom-message" style="display:none; background: #fff5f0; border: 1px solid rgba(255, 102, 0, 0.15); padding: 12px; border-radius: 12px; margin-bottom: 1.5rem; font-size: 0.8rem; font-weight: 600; color: #1f2937; line-height: 1.4;"></div>
 
-btn.addEventListener('click', function() {
-  const b = btn.innerText.toLowerCase(),
-        x = new XMLHttpRequest();
+        <div class="status">
+            <span class="status-dot" id="status-dot"></span>
+            <span id="stat">Checking...</span>
+        </div>
 
-  if( b == 'connect' ) {
-    x.addEventListener('readystatechange', () => {
-      if(x.readyState==4) {
-        btn.innerText='insert coin';
+        <div class="stats-row" id="stats-panel" style="display:none;">
+            <div class="stat-item" id="data-stat">
+                <strong id="mb_limit_display">0MB</strong>
+                <span>Data Left</span>
+            </div>
+            <div class="stat-item" id="time-stat" style="display:none;">
+                <strong id="time_limit_display">0m</strong>
+                <span>Time Left</span>
+            </div>
+        </div>
 
-        if( x.status === 200 ) {
-          s.innerText='connected';
+        <div id="device-info" style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 1.5rem;">
+            <div>IP: <span id="ip_display">...</span> | MAC: <span id="mac_display">...</span></div>
+        </div>
+
+        <button id="btn" class="main-btn primary">INSERT COIN</button>
+
+        <div id="voucher-section" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #f3f4f6;">
+            <div style="font-size: 0.75rem; font-weight: 700; color: #6b7280; text-transform: uppercase; margin-bottom: 0.75rem; letter-spacing: 0.05em;">Have a Voucher?</div>
+            <div style="display: flex; gap: 0.5rem;">
+                <input type="text" id="voucher_code" placeholder="Enter Code" style="margin-bottom: 0; font-family: monospace; font-weight: 700; text-transform: uppercase;">
+                <button onclick="redeemVoucher()" id="btn-redeem" class="primary" style="width: auto; margin-bottom: 0; padding: 0 1rem;">Use</button>
+            </div>
+            <div id="v-msg" style="font-size: 0.7rem; margin-top: 0.5rem; display: none;"></div>
+        </div>
+
+        <div class="footer-links">
+            <a href="/rates.html">Rates</a>
+            <a href="/txn.html">History</a>
+            <a href="/s.html">Share</a>
+        </div>
+
+        <!-- RADIO WIDGET -->
+        <div id="radio-container" style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 8px; display: flex; align-items: center; gap: 10px;">
+            <button id="radio-btn" onclick="toggleRadio()" style="background: #ff6600; color: white; border: none; border-radius: 50%; width: 32px; height: 32px; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <svg id="radio-icon" style="width:18px;height:18px;fill:currentColor;" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <div style="flex-grow: 1; overflow: hidden; text-align: left;">
+                <div id="radio-track" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.85rem; font-weight: 700; color: #1f2937;">OFF AIR</div>
+                <div id="radio-artist" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.7rem; color: #6b7280;">Live Radio Stream</div>
+            </div>
+            <div id="radio-timer" style="font-size: 0.7rem; font-family: monospace; color: #1f2937; background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px;">00:00</div>
+        </div>
+
+        <div style="margin-top: 2rem; font-size: 0.7rem; color: #9ca3af; line-height: 1.4;">
+            Developed by Colton Silva<br>
+            Orange WiFi for SilvaSystems distro
+        </div>
+    </div>
+
+    <!-- Hidden audio elements -->
+    <audio id="radio-audio" preload="auto"></audio>
+    <audio id="beep" src="/js/sfx/beep.mp3" preload="auto" loop></audio>
+    <audio id="bump" src="/js/sfx/bump.wav" preload="auto" loop></audio>
+    <audio id="coin" src="/js/sfx/coin.wav" preload="auto" loop></audio>
+    <audio id="yeeh" src="/js/sfx/yeeh.mp3" preload="auto" loop></audio>
+
+    <!-- Legacy elements -->
+    <p id="mac_addr" style="display:none"></p>
+    <p id="ip_addr" style="display:none"></p>
+    <p id="mb_free" style="display:none"></p>
+    <p id="wait"></p>
+    <p id="mb"></p>
+
+    <script>
+        // --- RADIO ENGINE (PRECISION) ---
+        const rAudio = document.getElementById('radio-audio');
+        const rTrack = document.getElementById('radio-track');
+        const rArtist = document.getElementById('radio-artist');
+        const rTimer = document.getElementById('radio-timer');
+        const rIcon = document.getElementById('radio-icon');
+        const rBtn = document.getElementById('radio-btn');
+        
+        let radioActive = false;
+        let radioSyncTimer = null;
+        let targetSeek = -1;
+        let currentFile = null;
+
+        // Metadata trigger
+        rAudio.addEventListener('loadedmetadata', () => {
+            if (targetSeek >= 0) {
+                rAudio.currentTime = targetSeek;
+                targetSeek = -1;
+            }
+        });
+
+        // Time update loop
+        rAudio.addEventListener('timeupdate', () => {
+            if (radioActive && !isNaN(rAudio.currentTime)) {
+                let m = Math.floor(rAudio.currentTime / 60), s = Math.floor(rAudio.currentTime % 60);
+                rTimer.innerText = `${m}:${s.toString().padStart(2, '0')}`;
+            }
+        });
+
+        // Track handover
+        rAudio.addEventListener('ended', () => {
+            if (radioActive) syncRadio(true);
+        });
+
+        function toggleRadio() {
+            if (radioActive) stopRadio();
+            else startRadio();
         }
 
-        if( x.status === 403 ) {
-          mb_free=0; alert('no data available');
-        }
-      }
-    });
-
-    x.open('POST','/api/connect.php');
-    x.send();
-  }
-
-  if( b == 'insert coin' ) {
-    btn.innerText='... ... ...';
-
-    x.addEventListener('readystatechange', () => {
-      if(x.readyState == 1) {
-        setTimeout(topup_check,1000);
-      }
-
-      if(x.readyState == 4) {
-        if(x.status == 200) {
-          s.innerText = 'connected';
-          btn.innerText = 'insert coin'; data_usage();
+        function startRadio() {
+            radioActive = true;
+            rBtn.style.transform = "scale(0.95)";
+            rIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+            syncRadio(true);
+            radioSyncTimer = setInterval(syncRadio, 10000);
         }
 
-        if(x.status == 401) {
-          bump.play(); alert('coinslot is busy');
-          setTimeout(()=>bump.pause(),bump.duration*1e3);
+        function stopRadio() {
+            radioActive = false;
+            rAudio.pause();
+            rBtn.style.transform = "scale(1)";
+            rIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+            rTrack.innerText = "OFF AIR";
+            rArtist.innerText = "Live Radio Stream";
+            rTimer.innerText = "00:00";
+            currentFile = null;
+            clearInterval(radioSyncTimer);
         }
 
-        if(x.status == 402) {
-          alert('payment required');
+        function syncRadio(force = false) {
+            if (!radioActive) return;
+            fetch('/admin/amusement/api.php').then(r => r.json()).then(d => {
+                if (d.status === 'playing') {
+                    // Logic: Track comparison based on server-provided name
+                    if (currentFile !== d.track) {
+                        currentFile = d.track;
+                        rAudio.src = '/css/sfx/radio/' + encodeURIComponent(d.track);
+                        targetSeek = d.seek;
+                        rAudio.load();
+                    } else if (force || Math.abs(rAudio.currentTime - d.seek) > 5) {
+                        rAudio.currentTime = d.seek;
+                    }
+                    if (rAudio.paused) rAudio.play().catch(() => rArtist.innerText = "TAP TO UNMUTE");
+                    rTrack.innerText = d.title;
+                    rArtist.innerText = d.artist;
+                } else { stopRadio(); }
+            }).catch(() => rTrack.innerText = "SIGNAL LOST");
         }
 
-        if(x.status == 403) {
-          alert('forbidden');
+        // --- PORTAL DESIGN ENGINE ---
+        (function() {
+            fetch('/css/img/design.json?v=' + Date.now())
+                .then(r => r.json())
+                .then(design => {
+                    if (design.background) {
+                        const img = new Image();
+                        img.src = design.background;
+                        img.onload = () => {
+                            document.body.style.backgroundImage = 'url(' + design.background + ')';
+                            document.body.style.backgroundSize = 'cover';
+                            document.body.style.backgroundPosition = 'center';
+                            document.body.style.backgroundAttachment = 'fixed';
+                        };
+                    }
+                    if (design.font) {
+                        const style = document.createElement('style');
+                        style.appendChild(document.createTextNode(`@font-face { font-family: 'PortalFont'; src: url('/fonts/${design.font}'); font-display: swap; } body { font-family: 'PortalFont', sans-serif !important; }`));
+                        document.head.appendChild(style);
+                    }
+                }).catch(e => console.log("Standard theme active."));
+        })();
+
+        // LOGIC COMPONENTS
+        const portalCard = document.getElementById('portal-card'),
+              toggleIcon = document.getElementById('toggle-icon'),
+              beep = document.getElementById('beep'),
+              bump = document.getElementById('bump'),
+              coin = document.getElementById('coin'),
+              btn = document.getElementById('btn'),
+              stat = document.getElementById('stat'),
+              dot = document.getElementById('status-dot'),
+              statsPanel = document.getElementById('stats-panel'),
+              l = document.getElementById('mb_limit_display');
+
+        const peso = new Intl.NumberFormat('en-PH', {style: 'currency', currency: 'PHP'});
+        let mb_free = 0;
+
+        function togglePortal() {
+            const isHidden = portalCard.classList.toggle('portal-hidden');
+            toggleIcon.innerHTML = isHidden 
+                ? '<path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.82l2.95 2.95c1.1-.73 2.05-1.66 2.83-2.77-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.34-1.07l1.81 1.82C13.46 10.33 13 11.1 13 12c0 .46.13.9.36 1.28l1.97 1.97c.41-.73.67-1.55.67-2.43 0-2.76-2.24-5-5-5-.88 0-1.7.26-2.43.67z"/>'
+                : '<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>';
         }
 
-        if(x.status == 429) {
-          bump.play(); alert('too many attempt');
-          setTimeout(()=>bump.pause(),bump.duration*1e3);
-        }
-      }
-    });
-
-    x.open('GET','/api/topup.php');
-    x.send();
-  }
-
-  if( b == 'done' ) {
-    x.open('GET','/api/topup_cancel.php');
-    btn.innerText='insert coin';
-    beep.pause();
-    x.send();
-  }
-});
-
-function topup_check() {
-  const x = new XMLHttpRequest();
-
-  x.addEventListener('readystatechange', () => {
-    if( x.readyState == 4 ) {
-      if( x.status == 200 ) {
-        let j = JSON.parse(x.responseText);
-
-        w.innerText = `waiting for payment (${j.cd})`;
-        m.innerHTML = 'AMT ' + peso.format(j.amt);
-        w.style.display='block';
-        btn.innerText='done';
-
-        if( j.mb ) { m.style.display='block'; }
-
-        if(j.amt != new_coin) {
-          new_coin=j.amt; beep.pause(); coin.play();
-          setTimeout(()=> coin.pause(), coin.duration*1e3);
-        } else { if(beep.paused) beep.play(); }
-
-        setTimeout(topup_check, 1000);
-      }
-
-      if( x.status == 401 ) {
-        beep.pause(); btn.innerText='insert coin';
-      }
-
-      if( x.status == 500 ) {
-        window.location.assign('/x.html');
-      }
-    }
-  });
-
-  x.open('GET','/api/topup_checker.php');
-  x.send();
-}
-
-function data_usage() {
-  const x = new XMLHttpRequest();
-
-  x.addEventListener('readystatechange', () => {
-    if( x.readyState == 4 ) {
-      if(x.status == 200) {
-        let j = JSON.parse(x.responseText);
-        mb_free = j.mb_limit - j.mb_used;
-
-        u.innerText=format_mb(j.mb_used);
-        l.innerText=format_mb(j.mb_limit);
-
-        if (j.mb_used>1) {
-          f.innerText = `/${format_mb(mb_free)}`;
-          f.style.display = mb_free>1e9 ? 'inline' : 'none';
+        function updateStatus(text, color) {
+            stat.innerText = text;
+            dot.className = 'status-dot ' + (color === 'green' ? '' : 'disconnected');
+            if(color === 'green') dot.style.backgroundColor = '#10b981';
+            else if(color === 'red') dot.style.backgroundColor = '#ef4444';
         }
 
-        mac.innerText = j.mac;
-        ip.innerText = j.ip;
-      }
+        btn.addEventListener('click', function() {
+            const b = btn.innerText.toLowerCase();
+            const x = new XMLHttpRequest();
 
-      if( x.status == 401 ) {
-        window.location.assign('/u.html');
-      }
-    }
-  });
+            if( b === 'connect' ) {
+                x.addEventListener('readystatechange', () => {
+                    if(x.readyState==4) {
+                        if(x.status === 200) updateStatus('Connected', 'green');
+                        else if(x.status === 403) alert('No Data Available');
+                    }
+                });
+                x.open('POST','/api/connect.php');
+                x.send();
+            } else if( b === 'insert coin' ) {
+                btn.innerText = 'WAITING FOR COINS...';
+                btn.classList.add('contrast');
+                x.addEventListener('readystatechange', () => {
+                    if(x.readyState == 1) setTimeout(topup_check, 1000);
+                });
+                x.open('GET','/api/topup.php');
+                x.send();
+            } else if( b === 'done' ) {
+                x.open('GET','/api/topup_cancel.php');
+                x.send();
+                btn.innerText = 'INSERT COIN';
+                btn.classList.remove('contrast');
+            }
+        });
 
-  x.open('GET','/api/data_usage.php');
-  x.send();
-}
-
-function network_status() {
-  const x = new XMLHttpRequest(),
-        z = s.innerText.toLowerCase();
-
-  x.addEventListener('readystatechange', () => {
-    if( x.readyState == 4 ) {
-
-      if( x.status === 200 ) {
-        if( z !== 'connected' ) {
-          if( z != 'checking network status' ) {
-            yeeh.play();setTimeout(()=>yeeh.pause(),yeeh.duration*1e3);
-          }
-          s.innerText = 'connected';
+        function topup_check() {
+            const x = new XMLHttpRequest();
+            x.addEventListener('readystatechange', () => {
+                if(x.readyState == 4 && x.status == 200) {
+                    let j = JSON.parse(x.responseText);
+                    btn.innerText = `INSERTED: ${peso.format(j.amt)} (DONE)`;
+                    setTimeout(topup_check, 1000);
+                } else if (x.status == 401) {
+                    btn.innerText = 'INSERT COIN';
+                    btn.classList.remove('contrast');
+                }
+            });
+            x.open('GET','/api/topup_checker.php');
+            x.send();
         }
-      }
 
-      if( x.status === 403 ) {
-        if( z !== 'disconnected' ) {
-          s.innerText = 'disconnected';
+        function data_usage() {
+            fetch('/api/data_usage.php').then(r => r.json()).then(j => {
+                statsPanel.style.display = 'flex';
+                
+                if (j.mb_limit > 0) {
+                    document.getElementById('data-stat').style.display = 'block';
+                    l.innerText = format_mb(j.data_remaining);
+                } else {
+                    document.getElementById('data-stat').style.display = 'none';
+                }
+
+                if (j.time_limit > 0) {
+                    document.getElementById('time-stat').style.display = 'block';
+                    document.getElementById('time_limit_display').innerText = format_time(j.time_remaining);
+                } else {
+                    document.getElementById('time-stat').style.display = 'none';
+                }
+                
+                mb_free = j.data_remaining;
+                let time_free = j.time_remaining;
+
+                document.getElementById('ip_display').innerText = j.ip;
+                document.getElementById('mac_display').innerText = j.mac;
+
+                if (j.status === 'Connected') {
+                    updateStatus('Connected', 'green');
+                    btn.innerText = 'CONNECTED';
+                } else {
+                    updateStatus('Disconnected', 'red');
+                    if (mb_free > 0 || time_free > 0) btn.innerText = 'CONNECT';
+                    else btn.innerText = 'INSERT COIN';
+                }
+            }).catch(() => {
+                statsPanel.style.display = 'none';
+                updateStatus('Disconnected', 'red');
+            });
         }
-      }
 
-      if( x.status === 500 ) {
-        window.location.assign('/x.html');
-      }
-
-      if( x.status === 599 ) {
-        if( z !== 'connect timeout' ) {
-          s.innerText = 'offline';
+        function format_time(mins) {
+            if (mins >= 1440) return (mins / 1440).toFixed(1) + 'd';
+            if (mins >= 60) return Math.floor(mins / 60) + 'h ' + (mins % 60) + 'm';
+            return mins + 'm';
         }
-      }
 
-      let k = s.innerText.toLowerCase();
+        function format_mb(size) {
+            size = parseFloat(size) || 0;
+            if(size<1) return '0MB';
+            let base = Math.floor(Math.log(size) / Math.log(1024));
+            let unit = ['MB','GB','TB','PB','EB'];
+            return (size / Math.pow(1024, base)).toFixed(2) + unit[base];
+        }
 
-      if( k !== 'checking network status' ) {
-        s.style.fontSize='28px';
-      }
+        function fetchMyInfo() {
+            fetch('/api/my_info.php').then(r => r.json()).then(d => {
+                document.getElementById('ip_display').innerText = d.ip;
+                document.getElementById('mac_display').innerText = d.mac;
+            });
+            // Fetch Identity and Custom Message
+            fetch('/api/vendo_info.php').then(r => r.json()).then(d => {
+                const vn = document.getElementById('vendo-name');
+                const cm = document.getElementById('custom-message');
+                
+                if (d.vendo_name) {
+                    vn.innerText = d.vendo_name;
+                    vn.style.display = 'block';
+                } else {
+                    vn.style.display = 'none';
+                }
 
-      if( k != z) data_usage();
+                if (d.custom_msg) {
+                    cm.innerText = d.custom_msg;
+                    cm.style.display = 'block';
+                } else {
+                    cm.style.display = 'none';
+                }
+            });
+        }
 
-      setTimeout(network_status, 10000);
-    }
-  });
+        function redeemVoucher() {
+            const code = document.getElementById('voucher_code').value.trim();
+            const msg = document.getElementById('v-msg');
+            const btnR = document.getElementById('btn-redeem');
+            if (!code) return;
+            btnR.setAttribute('aria-busy', 'true');
+            btnR.disabled = true;
+            fetch('/api/voucher_redeem.php', { method: 'POST', body: JSON.stringify({ code: code }) })
+            .then(r => r.json()).then(res => {
+                btnR.removeAttribute('aria-busy'); btnR.disabled = false;
+                msg.style.display = 'block';
+                if (res.status === 'SUCCESS') {
+                    msg.style.color = '#10b981'; msg.innerText = res.msg;
+                    document.getElementById('voucher_code').value = '';
+                    setTimeout(() => { data_usage(); msg.style.display = 'none'; }, 2000);
+                } else {
+                    msg.style.color = '#ef4444'; msg.innerText = res.error || 'Invalid voucher.';
+                }
+            }).catch(() => { btnR.removeAttribute('aria-busy'); btnR.disabled = false; msg.style.display = 'block'; msg.style.color = '#ef4444'; msg.innerText = 'Connection error.'; });
+        }
 
-  x.open('GET','/api/network_status.php');
-  x.send();
-}
-
-function button_check() {
-  let b = btn.innerText.toLowerCase(),
-      z = s.innerText.toLowerCase();
-
-  if( b === 'insert coin' ) {
-    btn.style.borderColor = '#11aa11';
-    btn.style.backgroundColor = '#22aa22';
-    m.style.display='none';
-    w.style.display='none';
-  }
-
-  if( b === 'done' ) {
-    btn.style.borderColor = '#aa1111';
-    btn.style.backgroundColor = '#aa2222';
-  }
-
-  if( z === 'disconnected' &&  mb_free > 0 ) {
-    btn.innerText = 'connect';
-  }
-
-  if( b === 'connect' ) {
-    btn.style.borderColor = '#FFB300';
-    btn.style.backgroundColor = '#ECA809';
-    m.style.display='none';
-    w.style.display='none';
-
-    if( mb_free < 1 ) {
-      btn.innerText = 'insert coin';
-    }
-  }
-
-  setTimeout(button_check,100);
-}
-
-function format_mb(size) {
-  size = parseFloat(size) || 0;
-
-  if( size<1 ) return '0MB';
-
-  let base = Math.floor(Math.log(size) / Math.log(1024));
-  let unit = ['MB','GB','TB','PB','EB','ZB','YB'];
-
-  size = size / Math.pow(1024, base);
-  size = Number.isInteger(size) ? size : size.toFixed(2);
-
-  return size + unit[base];
-}
-
-function alert(txt) {
-  let d = document.createElement('div');
-  d.style.backgroundColor='red';
-  d.style.textAlign='center';
-  d.style.position='fixed';
-  d.style.padding='5px';
-  d.style.color='white';
-  d.style.bottom='0px';
-  d.style.right='0px';
-  d.style.left='0px';
-  d.innerHTML=txt;
-
-  document.body.appendChild(d);
-
-  setTimeout(()=>d.remove(),3000);
-}
-
-topup_check(); network_status(); button_check();
-</script>
+        fetchMyInfo();
+        data_usage();
+        setInterval(data_usage, 5000);
+    </script>
 </body>
 </html>

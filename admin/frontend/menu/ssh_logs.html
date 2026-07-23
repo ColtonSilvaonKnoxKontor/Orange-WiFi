@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSH Logs</title>
+    <link rel="stylesheet" href="/css/pico.min.css">
+    <style>
+        body { padding: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; border-bottom: 1px solid #333; text-align: left; }
+        th { background: #222; color: #fff; }
+        .status-SUCCESS { color: #00ff00; font-weight: bold; }
+        .status-FAILED { color: #ff0000; font-weight: bold; }
+        .status-INVALID { color: #ff8800; }
+        .status-DISCONNECT { color: #888; }
+    </style>
+    <script src="security_check.js"></script>
+</head>
+<body>
+    <h2>SSH Access Logs</h2>
+    <button onclick="loadLogs()" style="margin-bottom: 15px; width: auto; padding: 5px 20px;">Refresh</button>
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Status</th>
+                    <th>User</th>
+                    <th>IP Address</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody id="log-body">
+                <tr><td colspan="5">Loading logs...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function loadLogs() {
+            fetch('../../shell_exec/ssh_parser.php')
+                .then(r => r.json())
+                .then(data => {
+                    const tbody = document.getElementById('log-body');
+                    tbody.innerHTML = '';
+                    
+                    if (data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5">No recent SSH activity found.</td></tr>';
+                        return;
+                    }
+
+                    data.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${row.ts}</td>
+                            <td class="status-${row.status}">${row.status}</td>
+                            <td>${row.user}</td>
+                            <td>${row.ip}</td>
+                            <td>${row.msg}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(e => {
+                    document.getElementById('log-body').innerHTML = `<tr><td colspan="5" style="color:red">Error: ${e.message}</td></tr>`;
+                });
+        }
+        loadLogs();
+        setInterval(loadLogs, 10000); // Auto-refresh
+    </script>
+</body>
+</html>

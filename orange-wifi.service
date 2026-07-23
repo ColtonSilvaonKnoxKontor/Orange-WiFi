@@ -1,0 +1,13 @@
+# this file should be located at
+# /lib/systemd/system/orange-wifi.service
+#
+[Unit]
+Description=Free and Open-Source WiFi Vendo Software
+
+[Service]
+Type=oneshot
+ExecStart=/home/pi/orange-wifi/start
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,30 @@
+<h3>System Troubleshooting</h3>
+<p style="color: #64748b; font-weight: 600;">Consult this guide if you encounter operational issues with the SilvaSystems distribution.</p>
+
+<hr style="margin: 25px 0;">
+
+<h4 style="color: #ff6600;">Connectivity and Initialization</h4>
+<p>If client devices (Windows, iPhone, Android) report a successful connection but indicate "No Internet Access," or if the captive portal fails to load, it typically indicates a service initialization failure or kernel instability during boot.</p>
+
+<p><strong>Common Indicators:</strong></p>
+<ul>
+    <li>Failure of specific <code>systemd</code> network services (e.g., <code>[ERROR] Failed to start orange-wifi.service</code>). These indicators are typically visible during the boot sequence when using an HDMI monitor to observe system logs.</li>
+    <li>Kernel Panic (System may become unresponsive or restart unexpectedly).</li>
+    <li>Use of counterfeit or low-performance SD/TF cards (causing I/O bottlenecks or filesystem synchronization errors).</li>
+    <li>External Access Point configuration error: Ensure your router is not overriding the gateway assignment. Client devices must receive <code>10.0.0.1</code> as the Default Gateway to reach the portal. If the router assigns its own internal IP address as the gateway, internet routing will fail.</li>
+</ul>
+
+<hr style="margin: 25px 0;">
+
+<h4 style="background: #fff5f0; color: #ff6600; padding: 15px; border-radius: 10px; border: 1px solid #ff6600; font-weight: 800;">
+    <svg style="width:20px;height:20px;vertical-align:middle;margin-right:8px;fill:currentColor" viewBox="0 0 24 24"><path d="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z"/></svg>
+    Recommended Solution: Physical Power Cycle
+</h4>
+<p style="margin-top: 15px;">Most initialization and kernel-level synchronization errors are resolved by a hardware reset.</p>
+<ol>
+    <li>Disconnect the power source from the Orange Pi One.</li>
+    <li>Wait 5 seconds to ensure complete power discharge.</li>
+    <li>Reconnect the power source.</li>
+    <li>Verify system status once the heartbeat LED indicates an active state.</li>
+</ol>
+<p>Repeat this sequence if necessary until the system boots successfully and all services are active.</p>

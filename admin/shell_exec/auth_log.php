@@ -1,0 +1,1 @@
+<?php echo shell_exec('tail -n 200 /var/log/auth.log'); ?>

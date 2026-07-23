@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Viewer</title>
+    <link rel="stylesheet" href="/css/pico.min.css">
+    <style>
+        body { padding: 20px; height: 100vh; display: flex; flex-direction: column; box-sizing: border-box; overflow: hidden; }
+        h2 { margin-bottom: 10px; flex-shrink: 0; }
+        #log-container {
+            background: #111;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 15px;
+            overflow-y: auto;
+            border-radius: 4px;
+            flex-grow: 1;
+            white-space: pre;
+            font-size: 0.8rem;
+            border: 1px solid #333;
+        }
+        .controls { margin-bottom: 10px; flex-shrink: 0; display: flex; gap: 10px; align-items: center; }
+        .controls button { width: auto; padding: 5px 20px; font-size: 0.9rem; }
+        .status { font-size: 0.8rem; color: #888; }
+    </style>
+</head>
+<body>
+    <h2>Task Viewer</h2>
+    <div class="controls">
+        <button onclick="fetchTasks()">Refresh</button>
+        <span class="status" id="last-update">Last update: ...</span>
+    </div>
+    <div id="log-container">Loading system tasks...</div>
+
+    <script>
+        function fetchTasks() {
+            const container = document.getElementById('log-container');
+            const status = document.getElementById('last-update');
+            
+            fetch('../../shell_exec/tasks.php')
+                .then(r => {
+                    if(!r.ok) throw new Error("Access Denied");
+                    return r.text();
+                })
+                .then(data => {
+                    container.innerText = data || "No data available.";
+                    status.innerText = "Last update: " + new Date().toLocaleTimeString();
+                })
+                .catch(e => {
+                    container.innerText = "Error loading tasks: " + e.message;
+                });
+        }
+        
+        // Auto refresh every 5 seconds
+        setInterval(fetchTasks, 5000);
+        fetchTasks();
+    </script>
+</body>
+</html>

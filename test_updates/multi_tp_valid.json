@@ -1,0 +1,14 @@
+{
+  "/home/pi/orange-wifi/dummy1/tp_1.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file1.txt",
+  "/home/pi/orange-wifi/dummy1/tp_2.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file2.txt",
+  "/home/pi/orange-wifi/dummy1/tp_3.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file3.txt",
+  "/home/pi/orange-wifi/dummy1/tp_4.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file4.txt",
+  "/home/pi/orange-wifi/dummy1/tp_5.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file5.txt",
+  "/home/pi/orange-wifi/dummy2/tp_6.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file6.txt",
+  "/home/pi/orange-wifi/dummy2/tp_7.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file7.txt",
+  "/home/pi/orange-wifi/dummy2/tp_8.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file8.txt",
+  "/home/pi/orange-wifi/dummy/dumdum/tp_9.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file9.txt",
+  "/home/pi/orange-wifi/dummy/dumdum/tp_10.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file10.txt",
+  "/home/pi/orange-wifi/dummy/dumdum/tp_11.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file11.txt",
+  "/home/pi/orange-wifi/dummy/dumdum/tp_12.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file12.txt"
+}

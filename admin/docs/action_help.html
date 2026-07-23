@@ -1,0 +1,63 @@
+<h3>Actions Help</h3>
+
+<h4>System Management</h4>
+<p>The System Management interface provides control over the internal services and hardware power states of your device.</p>
+
+<hr>
+
+<h4>Service Maintenance</h4>
+<p>This function restarts the background services that power your dashboard and portal.</p>
+
+<div style="background: #f8fafc; border: 1px solid #ff6600; padding: 15px; border-radius: 8px; margin-top: 10px;">
+    <h5 style="color: #ff6600; margin-bottom: 10px; font-weight: 800; text-transform: uppercase;">Requirement: System Refresh</h5>
+    <p style="font-size: 0.85rem; line-height: 1.4; margin-bottom: 10px;">To ensure system changes are applied, a service restart is required for the following reasons:</p>
+    
+    <ul style="font-size: 0.8rem; margin-bottom: 15px;">
+        <li><strong>Cache Clearing:</strong> The system stores data in temporary memory for efficiency. A restart clears this data, ensuring new updates are loaded correctly.</li>
+        <li><strong>Subsystem Sync:</strong> Restores the internal connection between the web interface and the core logic modules.</li>
+        <li><strong>UI Synchronization:</strong> After the restart, you <strong>must reload your browser</strong> to synchronize with the updated interface and settings.</li>
+    </ul>
+</div>
+
+<hr>
+
+<h4>Hardware Power Control</h4>
+<p>Provides standard instructions for system power cycles:</p>
+<ul>
+    <li><strong>Reboot:</strong> Performs a safe hardware restart.</li>
+    <li><strong>Power Off:</strong> Safely shuts down the system hardware.</li>
+</ul>
+
+<hr>
+
+<h4>Developer Key Management</h4>
+<p>This interface allows you to manage trust for external software contributors. By importing an <strong>Orange WiFi Key (.owk)</strong>, you enable a specific developer to provide updates for your system.</p>
+
+<div style="background: #f8fafc; border: 1px solid #ff6600; padding: 15px; border-radius: 8px; margin-top: 10px;">
+    <h5 style="color: #ff6600; margin-bottom: 10px; font-weight: 800; text-transform: uppercase;">Security Architecture: Sandboxed Updates</h5>
+    <p style="font-size: 0.85rem; line-height: 1.4; margin-bottom: 10px;">Trust is managed through a multi-tier hierarchy to protect system integrity:</p>
+    
+    <ul style="font-size: 0.8rem; margin-bottom: 15px;">
+        <li><strong>Restricted Scope:</strong> Third-party updates are confined to the <code>orange-wifi</code> software directory. They cannot modify system files or configurations.</li>
+        <li><strong>Information Audit:</strong> Every package includes developer identity and contact information. Review these details carefully before providing access.</li>
+        <li><strong>Revocable Trust:</strong> You can remove a developer's access at any time by deleting their entry from the list, blocking all future updates from that source.</li>
+    </ul>
+</div>
+
+<hr>
+
+<h4>System Updates</h4>
+<p>The System Updates interface allows you to deploy new features, bug fixes, and improvements using <strong>Orange WiFi Packages (.owp)</strong>.</p>
+
+<div style="background: #f8fafc; border: 1px solid #ff6600; padding: 15px; border-radius: 8px; margin-top: 10px;">
+    <h5 style="color: #ff6600; margin-bottom: 10px; font-weight: 800; text-transform: uppercase;">About System Update:</h5>
+    <p style="font-size: 0.85rem; line-height: 1.4; margin-bottom: 10px;">The system processes updates through two primary paths based on the package source:</p>
+    
+    <ul style="font-size: 0.8rem; margin-bottom: 15px;">
+        <li><strong>Official Updates:</strong> Primary updates provided directly by the software distributor. These packages are validated for compatibility to ensure system authenticity.</li>
+        <li><strong>Third-Party Updates:</strong> Software modules provided by enabled external developers. These packages are audited and confined to the <code>orange-wifi</code> software boundaries to protect system stability.</li>
+        <li><strong>Installation Telemetry:</strong> All updates provide a real-time console log. Monitor this terminal to verify the successful staging and synchronization of your files.</li>
+    </ul>
+    
+    <p style="font-size: 0.85rem; font-style: italic; color: #64748b;">Note: Do not disconnect power or interrupt the network during an active update sequence to prevent system state errors.</p>
+</div>

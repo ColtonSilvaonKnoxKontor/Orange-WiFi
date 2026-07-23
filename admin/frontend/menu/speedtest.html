@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Diagnostic</title>
+    <link rel="stylesheet" href="/css/pico.min.css">
+    <style>
+        :root { --primary: #ff6600; }
+        body { padding: 20px; background-color: #f8fafc; min-height: 100vh; font-family: system-ui, -apple-system, sans-serif; }
+        
+        /* EXACT VOUCHER HEADER DESIGN */
+        .header-box { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 3px solid #ff6600; padding-bottom: 15px; }
+        .header-box h2 { margin: 0; color: #1a202c; text-transform: uppercase; font-weight: 900; letter-spacing: 1px; }
+
+        .card { background: #fff; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 30px; border: 1px solid #f1f5f9; }
+        
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; max-width: 600px; }
+        .gen-btn { background: #1a202c; border: none; border-radius: 12px; font-weight: 800; padding: 15px; color: white; cursor: pointer; text-transform: uppercase; transition: all 0.2s; font-size: 0.85rem; }
+        .gen-btn:hover { background: #4a5568; }
+        .gen-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-orange { background: #ff6600 !important; }
+        .btn-orange:hover { background: #e65c00 !important; }
+
+        .log-box { background: #0f172a; color: #4ade80; padding: 15px; border-radius: 10px; font-family: monospace; font-size: 0.8rem; margin-top: 25px; min-height: 400px; overflow-y: auto; border: 1px solid #1e293b; text-align: left; white-space: pre-wrap; }
+    </style>
+    <script src="security_check.js"></script>
+</head>
+<body>
+    <main>
+        <div class="header-box">
+            <h2>Network Diagnostic</h2>
+        </div>
+
+        <div class="card">
+            <p style="color: #64748b; font-weight: 600; margin-bottom: 20px;">Perform speedtest to verify bandwidth limit.</p>
+            
+            <div class="btn-grid">
+                <button id="run-mbps" class="gen-btn btn-orange" onclick="runTest('Mbps')">Run Speedtest (Mbps)</button>
+                <button id="run-mbytes" class="gen-btn" onclick="runTest('MB/s')">Run Speedtest (MB/s)</button>
+            </div>
+
+            <div id="log" class="log-box">System ready. Click a button to initiate diagnostic.</div>
+        </div>
+    </main>
+
+    <script>
+        async function runTest(unit) {
+            const btnMbps = document.getElementById('run-mbps');
+            const btnMbytes = document.getElementById('run-mbytes');
+            const log = document.getElementById('log');
+
+            btnMbps.disabled = true;
+            btnMbytes.disabled = true;
+            log.innerHTML = `[INFO] Initializing test sequence (${unit})...\n`;
+
+            try {
+                const response = await fetch('../../management/speedtest_api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ unit: unit })
+                });
+                
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    const text = decoder.decode(value, { stream: true });
+                    // Filter out EULA noise
+                    if (!text.includes("EULA") && !text.includes("Terms of Use") && !text.includes("Privacy Policy")) {
+                        log.innerHTML += text;
+                        log.scrollTop = log.scrollHeight;
+                    }
+                }
+
+                log.innerHTML += "\nSpeedtest complete";
+            } catch (e) {
+                log.innerHTML += "\n[ERROR] Diagnostic failure: " + e.message;
+            } finally {
+                btnMbps.disabled = false;
+                btnMbytes.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

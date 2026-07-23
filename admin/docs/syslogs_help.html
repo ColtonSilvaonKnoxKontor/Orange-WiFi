@@ -1,0 +1,50 @@
+<h3>System Logs Help</h3>
+
+<h4>Kernel Log</h4>
+<p>Displays the real-time kernel ring buffer (dmesg). This is essential for hardware troubleshooting, identifying USB device connections, and monitoring kernel-level security events.</p>
+
+<div style="background: #f8fafc; border: 1px solid #ff6600; padding: 20px; border-radius: 12px; margin-top: 15px;">
+    <h5 style="color: #ff6600; margin-bottom: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">CYBERSECURITY TIPS</h5>
+    <p style="font-size: 0.85rem; line-height: 1.4; margin-bottom: 20px;">Monitor your Kernel Logs for high-priority security warnings. A specific indicator of a network-layer attack is the following record:</p>
+    
+    <div style="background: #1a202c; color: #4ade80; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 0.7rem; margin-top: 8px; border-left: 4px solid #e53e3e;">
+        [ATTACK: SYN Flood Warning]<br>
+        [ 31.026672] TCP: request_sock_TCP: Possible SYN flooding on port 0.0.0.0:80. Sending cookies.
+    </div>
+
+    <p style="font-size: 0.85rem; line-height: 1.4; margin: 15px 0 10px 0;">Another critical indicator is a high-frequency sequence of ICMP block logs. <strong>Note:</strong> These logs are only generated when <strong>ICMP Flood Protection</strong> is ACTIVE. If the protection is disabled, you must instead monitor for an abnormal rise in TX and RX traffic on the <strong>Overview</strong> dashboard.</p>
+    
+    <div style="background: #1a202c; color: #4ade80; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 0.7rem; border-left: 4px solid #ff6600;">
+        [ATTACK: ICMP Flood Blocked]<br>
+        [ 855.733833] [ORANGE-WIFI-ICMP-BLOCK] IN=eth0 OUT= MAC=02:81:88:21:5b:c9:00:21:9b:da:4f:63:08:00 SRC=192.168.100.16 DST=192.168.100.44 LEN=28 ... PROTO=ICMP TYPE=8 CODE=0
+    </div>
+
+    <div style="font-size: 0.75rem; color: #4a5568; margin-top: 10px;">
+        <strong>Log Breakdown:</strong>
+        <ul style="margin-top: 5px;">
+            <li><strong>IN=eth0:</strong> The interface where the attack was intercepted.</li>
+            <li><strong>MAC:</strong> The combined Destination and Source hardware addresses.</li>
+            <li><strong>SRC:</strong> The IP address of the attacker initiating the flood.</li>
+            <li><strong>DST:</strong> Your Orange Pi's local IP address.</li>
+            <li><strong>PROTO=ICMP:</strong> Confirms the attack is using the Ping protocol.</li>
+            <li><strong>TYPE=8:</strong> Indicates an "Echo Request," the standard Ping probe.</li>
+        </ul>
+    </div>
+
+    <p style="color: #e53e3e; font-weight: 700; margin-top: 15px; font-size: 0.85rem;">WARNING: If these logs appear frequently, enable DoS Defense immediately to prevent network saturation.</p>
+</div>
+
+<hr>
+
+<h4>Authentication Log</h4>
+<p>Provides a view of the secure `/var/log/auth.log` file. Use this to monitor:</p>
+<ul>
+    <li><strong>Sudo attempts:</strong> See every command run with root privileges.</li>
+    <li><strong>System Logins:</strong> Monitor console and background service authentications.</li>
+</ul>
+
+<hr>
+
+<h4>Task Viewer</h4>
+<p>A real-time snapshot of running processes, CPU load, and memory usage. It acts as a web-based task manager for your Orange Pi, allowing you to see which services are consuming resources.</p>
+<p>The Task Viewer automatically refreshes every 5 seconds.</p>

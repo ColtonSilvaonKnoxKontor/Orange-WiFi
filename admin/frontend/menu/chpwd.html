@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Change Password</title>
+<link href="/css/pico.min.css" rel="stylesheet">
+<style>
+body { padding: 20px; }
+.alert { background-color: green; text-align: center; color: white; padding: .75em 0; position: fixed; margin: 0; bottom: 0; right: 0; left: 0; display: none; }
+.error { background-color: red !important; }
+.warn-box { background: #fffaf0; border-left: 5px solid #ff6600; padding: 15px; margin-bottom: 20px; border-radius: 4px; font-size: 0.85rem; color: #d97706; }
+</style>
+<script src="security_check.js"></script>
+</head>
+<body>
+<main class="container">
+    <h2>Change Admin Password</h2>
+    
+    <div class="warn-box">
+        <i class="fas fa-exclamation-triangle"></i> <strong>Strict Security Active:</strong> 
+        To prevent session hijacking takeovers, you must provide your <strong>Orange Star ID</strong> to authorize a password change.
+    </div>
+
+    <article>
+        <label for="osid">Verify Orange Star ID</label>
+        <input type="text" id="osid" placeholder="Enter your 64-char ID" required>
+
+        <label for="password">New Password</label>
+        <input id="password" type="password" placeholder="Minimum 3 characters" required>
+    
+        <button class="primary" onclick="updatePassword()" id="btn-update">Update Password</button>
+    </article>
+    
+    <div id="alert-box" class="alert"></div>
+</main>
+
+<script>
+function showAlert(t, isError = false) {
+    const box = document.getElementById('alert-box');
+    box.innerText = t;
+    box.className = isError ? 'alert error' : 'alert';
+    box.style.display = 'block';
+    setTimeout(() => box.style.display = 'none', 4000);
+}
+
+function updatePassword() {
+    const osid = document.getElementById('osid').value.trim();
+    const pass = document.getElementById('password').value.trim();
+    const btn = document.getElementById('btn-update');
+
+    if (!osid || pass.length < 3) {
+        showAlert('Please fill in all fields (Min 3 chars for password)', true);
+        return;
+    }
+
+    btn.setAttribute('aria-busy', 'true');
+    btn.disabled = true;
+
+    const payload = JSON.stringify({
+        action: 'update_password',
+        orangestar_id: osid,
+        new_password: pass
+    });
+
+    fetch('../../pass.php', {
+        method: 'PATCH',
+        body: payload
+    })
+    .then(r => r.text())
+    .then(res => {
+        btn.removeAttribute('aria-busy');
+        btn.disabled = false;
+
+        if (res.trim() === 'SUCCESS') {
+            showAlert('Password Updated Successfully! All other sessions terminated.');
+            document.getElementById('osid').value = '';
+            document.getElementById('password').value = '';
+        } else if (res.includes('WRONG_ID')) {
+            showAlert('Invalid Orange Star ID!', true);
+        } else if (res.includes('TOO_WEAK')) {
+            showAlert('Password is too weak!', true);
+        } else {
+            showAlert('Error: ' + res, true);
+        }
+    })
+    .catch(e => {
+        btn.removeAttribute('aria-busy');
+        btn.disabled = false;
+        showAlert('Network Error', true);
+    });
+}
+</script>
+</body>
+</html>

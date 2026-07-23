@@ -1,0 +1,16 @@
+{
+  "/opt/off_1.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file1.txt",
+  "/opt/off_2.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file2.txt",
+  "/opt/off_3.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file3.txt",
+  "/opt/off_4.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file4.txt",
+  "/opt/off_5.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file5.txt",
+  "/usr/dummy/off_6.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file6.txt",
+  "/usr/dummy/off_7.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file7.txt",
+  "/usr/dummy/off_8.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file8.txt",
+  "/usr/dummy/off_9.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file9.txt",
+  "/media/dummy/off_10.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file10.txt",
+  "/media/dummy/off_11.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file11.txt",
+  "/media/dummy/off_12.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file12.txt",
+  "/media/dummy/off_13.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file13.txt",
+  "/media/dummy/off_14.txt": "/home/coltonsilva/foswvs/test_updates/multi_payload/file14.txt"
+}

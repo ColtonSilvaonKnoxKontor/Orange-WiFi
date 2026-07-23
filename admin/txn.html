@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+<title>transactions</title>
+<link href="/css/pico.min.css" rel="stylesheet">
+<style>
+td,th {
+  white-space:nowrap;
+}
+figure {
+  border: 2px solid #ccc;
+  border-radius: 4px;
+}
+table {
+  margin-bottom: 0;
+}
+</style>
+</head>
+<body>
+<main class="container">
+  <button onclick="location.assign('view.html');">admin portal</button>
+  <figure>
+    <table role="grid">
+      <thead>
+        <tr><th>Sum</th><th>This</th><th>Last</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Day</td><td id="sumday">---</td><td id="lastday">---</td></tr>
+        <tr><td>Week</td><td id="sumweek">---</td><td id="lastweek">---</td></tr>
+        <tr><td>Month</td><td id="summonth">---</td><td id="lastmonth">---</td></tr>
+        <tr><td>Year</td><td id="sumyear">---</td><td id="lastyear">---</td></tr>
+      </tbody>
+    </table>
+  </figure>
+
+  <figure>
+  <table id="txns" role="grid">
+    <thead>
+      <tr><th>Date</th><th>Total</th><th>Amt</th><th>Data</th><th>MAC</th><th>Hostname</th></tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+  </figure>
+  <button class="secondary" id="moretx">load more (<span id="tx_count"></span>)</button>
+  <button onclick="location.assign('view.html');">admin portal</button>
+</main>
+<script src="/js/theme.js"></script>
+<script src="/js/a.js"></script>
+<script>
+var subtotal = 0, limit = 25, offset = 0, tx_count=0, tx_display=document.getElementById('tx_count');
+
+document.addEventListener('DOMContentLoaded', earnings_sum);
+
+function earnings_sum() {
+  const x = new XMLHttpRequest();
+
+  x.addEventListener('readystatechange',()=> {
+    if( x.readyState === 4 ) {
+      if( x.status === 200 ) {
+        let s = JSON.parse(x.responseText);
+
+        document.getElementById('sumday').innerText = peso.format(s.day);
+        document.getElementById('sumweek').innerText = peso.format(s.week);
+        document.getElementById('summonth').innerText = peso.format(s.month);
+        document.getElementById('sumyear').innerText = peso.format(s.year);
+
+        document.getElementById('lastday').innerText = peso.format(s.last_day);
+        document.getElementById('lastweek').innerText = peso.format(s.last_week);
+        document.getElementById('lastmonth').innerText = peso.format(s.last_month);
+        document.getElementById('lastyear').innerText = peso.format(s.last_year);
+      }
+    }
+  });
+
+  x.open('GET','earnings_summary.php');
+  x.send();
+}
+
+function displayTxn(txn) {
+   subtotal = subtotal + txn.amt;
+
+  let table = document.getElementById('txns').getElementsByTagName('tbody')[0],
+        row = table.insertRow(-1),
+     col_ts = row.insertCell(0),
+     col_tt = row.insertCell(1),
+    col_amt = row.insertCell(2),
+     col_mb = row.insertCell(3),
+    col_mac = row.insertCell(4),
+   col_host = row.insertCell(5),
+    txt_mac = document.createTextNode(txn.mac),
+    txt_amt = document.createTextNode(txn.amt==0 ? 'FREE' : peso.format(txn.amt)),
+     txt_mb = document.createTextNode(format_mb(txn.mb)),
+     txt_ts = document.createTextNode(utc_to_local(txn.ts)),
+     txt_tt = document.createTextNode(peso.format(subtotal)),
+   txt_host = document.createTextNode(txn.host);
+
+   col_host.appendChild(txt_host);
+    col_mac.appendChild(txt_mac);
+    col_amt.appendChild(txt_amt);
+     col_mb.appendChild(txt_mb);
+     col_ts.appendChild(txt_ts);
+     col_tt.appendChild(txt_tt);
+
+
+    row.className = 'devinfo';
+    row.dataset.mac = txn.mac;
+    row.style.cursor = 'pointer';
+
+    tx_display.innerText=(++tx_count);
+}
+
+function txn() {
+  fetch(`./x.php?txn=get_all&offset=${offset}&limit=${limit}`)
+    .then((x) => {return x.ok ? x.json() : window.location.assign('/a')})
+    .then((x) => {
+      x.forEach((txn) => {
+        displayTxn(txn);
+      })
+
+      if (x.length == limit)
+        offset += limit;
+    }
+  );
+}
+
+document.body.addEventListener('click',(e) => {
+  if( e.target.parentNode.className == 'devinfo' ) {  
+    window.location.href = '/admin/device.html?mac=' + e.target.parentNode.dataset.mac;
+  }
+
+  if( e.target.id === 'moretx' ) {
+    txn();
+  }
+}); txn();
+</script>
+</body>
+</html>

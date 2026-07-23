@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restricted Terminal</title>
+    <link rel="stylesheet" href="/css/pico.min.css">
+    <style>
+        body { padding: 20px; height: 100vh; display: flex; flex-direction: column; box-sizing: border-box; overflow: hidden; }
+        h2 { margin-bottom: 10px; flex-shrink: 0; }
+        #terminal-output {
+            background: #000;
+            color: #0f0;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 15px;
+            overflow-y: auto;
+            border-radius: 4px;
+            flex-grow: 1;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            border: 1px solid #333;
+        }
+        .input-area { display: flex; gap: 10px; flex-shrink: 0; }
+        .input-area input { flex-grow: 1; margin-bottom: 0; background: #111; color: #fff; border-color: #444; }
+        .input-area button { width: auto; margin-bottom: 0; }
+        .help-text { font-size: 0.8rem; color: #888; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <h2>Restricted Terminal</h2>
+    <div id="terminal-output">Welcome to SilvaSystems Restricted Terminal.</div>
+    
+    <div class="input-area">
+        <input type="text" id="cmd-input" placeholder="Enter command..." autofocus>
+        <button onclick="runCommand()" id="send-btn">Run</button>
+    </div>
+
+    <script>
+        const input = document.getElementById('cmd-input');
+        const output = document.getElementById('terminal-output');
+        const btn = document.getElementById('send-btn');
+
+        input.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                runCommand();
+            }
+        });
+
+        function runCommand() {
+            const command = input.value.trim();
+            if (!command) return;
+
+            // Show command in output
+            output.innerText += "\n\n$ " + command + "\nExecuting...";
+            output.scrollTop = output.scrollHeight;
+
+            input.value = '';
+            input.disabled = true;
+            btn.disabled = true;
+
+            fetch('../../terminal/exec.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ command: command })
+            })
+            .then(r => r.json())
+            .then(data => {
+                output.innerText += "\n" + data.output;
+                output.scrollTop = output.scrollHeight;
+            })
+            .catch(e => {
+                output.innerText += "\nError: " + e.message;
+            })
+            .finally(() => {
+                input.disabled = false;
+                btn.disabled = false;
+                input.focus();
+            });
+        }
+    </script>
+</body>
+</html>

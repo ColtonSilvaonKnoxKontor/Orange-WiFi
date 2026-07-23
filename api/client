@@ -1,11 +1,16 @@
 #!/usr/bin/php
 <?php
+/**
+ * [!] By Colton Silva (chinawaterstealers).
+ * SilvaSystems Secure Client Registration Hook
+ */
 require __DIR__ . '/../lib/autoload.php';
 
 $ip = $argv[1];
 $mac = $argv[2];
 $host = $argv[3];
 
+// Fix for missing leading zeros in MAC
 if( !filter_var($mac, FILTER_VALIDATE_MAC) ) {
   $mac = implode(':',array_map(function($s){return str_pad($s,2,'0',STR_PAD_LEFT);},explode(':',$mac)));
 }
@@ -18,17 +23,22 @@ if( filter_var($ip, FILTER_VALIDATE_IP) && filter_var($mac, FILTER_VALIDATE_MAC)
   $db->set_mac(strtoupper($mac));
 
   if( !$db->get_device_id() ) {
-    $db->add_device(); exit;
+    $db->add_device(); 
+  } else {
+    $db->update_device();
   }
 
-  $db->update_device();
+  // Time-aware balance check
+  list($mb_limit, $mb_used, $time_limit, $time_used) = $db->get_data_usage();
 
-  list($mb_limit, $mb_used) = $db->get_data_usage();
+  $data_ok = ($mb_limit > 0 && $mb_limit > $mb_used);
+  $time_ok = ($time_limit > 0 && $time_limit > $time_used);
 
-  if( $mb_limit > $mb_used ) {
+  if( $data_ok || $time_ok ) {
     $ipt = new Iptables($ip);
     $ipt->add_client();
   }
 }
 
 exit;
+?>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Management</title>
+    <link rel="stylesheet" href="/css/pico.min.css">
+    <style>
+        body { padding: 20px; }
+        .control-panel {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+            text-align: center;
+        }
+        .desc { color: #666; margin-bottom: 1.5rem; font-size: 0.9rem; }
+        button.restart-btn { background: #ff6600 !important; border: none !important; font-weight: bold; }
+    </style>
+    <script src="security_check.js"></script>
+</head>
+<body>
+    <main>
+        <h2>System Management</h2>
+        
+        <div class="control-panel">
+            <h4>Web Server Maintenance</h4>
+            <p class="desc">Restart the Nginx and PHP services to apply new code changes and clear all internal caches. This will NOT reboot the hardware.</p>
+            
+            <button id="restart-btn" class="restart-btn" onclick="restartServer()">APPLY UPDATES / RESTART SERVICES</button>
+            <p id="status-msg" style="margin-top: 15px; font-weight: bold;"></p>
+        </div>
+
+        <div class="control-panel" style="margin-top: 25px; border-top: 3px solid #e53e3e;">
+            <h4>Hardware Power Control</h4>
+            <p class="desc">Perform low-level power operations on the Orange Pi. These actions will physically disconnect the network.</p>
+            
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <button class="restart-btn" style="background: #dd6b20 !important;" onclick="powerAction('reboot')">REBOOT HARDWARE</button>
+                <button class="restart-btn" style="background: #c53030 !important;" onclick="powerAction('shutdown')">POWER OFF</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function powerAction(action) {
+            const label = action === 'reboot' ? 'REBOOT' : 'SHUTDOWN';
+            if (!confirm(`CRITICAL: Initiate full hardware ${label}? This will physically disconnect all users.`)) return;
+
+            const msg = document.getElementById('status-msg');
+            msg.style.color = "#ff6600";
+            msg.innerText = `SENDING ${label} INSTRUCTION...`;
+
+            fetch(`../../shell_exec/sys_power.php?action=${action}`)
+                .then(r => r.text())
+                .then(res => {
+                    if (res.includes("SUCCESS")) {
+                        msg.style.color = "green";
+                        msg.innerText = `${label} INITIATED. CONNECTION WILL TERMINATE.`;
+                    } else {
+                        msg.style.color = "red";
+                        msg.innerText = "Error: " + res;
+                    }
+                })
+                .catch(e => {
+                    msg.style.color = "orange";
+                    msg.innerText = `${label} COMMAND SENT. HARDWARE IS NOW CYCLING.`;
+                });
+        }
+
+        function restartServer() {
+            if (!confirm("This will briefly disconnect the dashboard while services restart. Continue?")) return;
+
+            const btn = document.getElementById('restart-btn');
+            const msg = document.getElementById('status-msg');
+
+            btn.disabled = true;
+            btn.innerText = "RESTARTING...";
+            msg.innerText = "Sending request to SilvaSystems Loader...";
+
+            fetch('../../shell_exec/restart_server.php')
+                .then(r => r.text())
+                .then(res => {
+                    if (res.includes("SUCCESS")) {
+                        msg.style.color = "green";
+                        msg.innerText = "Services restarted successfully! Refreshing dashboard in 3s...";
+                        setTimeout(() => window.top.location.reload(), 3000);
+                    } else {
+                        msg.style.color = "red";
+                        msg.innerText = "Error: " + res;
+                        btn.disabled = false;
+                        btn.innerText = "APPLY UPDATES / RESTART SERVICES";
+                    }
+                })
+                .catch(e => {
+                    // Note: A 502 error here is actually good, it means the server stopped!
+                    msg.style.color = "orange";
+                    msg.innerText = "Service restart initiated. Connection may drop briefly. Refreshing...";
+                    setTimeout(() => window.top.location.reload(), 5000);
+                });
+        }
+    </script>
+</body>
+</html>

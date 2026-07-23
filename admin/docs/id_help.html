@@ -1,0 +1,39 @@
+<h3>Orange Star ID Help</h3>
+
+<h4>What is it?</h4>
+<p>The <strong>Orange Star ID</strong> is a unique, hardware-locked security identifier. It is cryptographically derived from the immutable characteristics of your specific device, creating a permanent bond between the SilvaSystems software and your physical hardware.</p>
+
+<h4>Why is it critical?</h4>
+<p>This ID serves as your <strong>Master Recovery Key</strong> and the foundation of the system's trust model:</p>
+<ul>
+    <li>It ensures the system cannot be cloned or run on unauthorized hardware.</li>
+    <li>It acts as a mandatory second factor for sensitive operations, such as password recovery.</li>
+    <li>It prevents "Database Hijacking" – even if an attacker steals your configuration, they cannot use it on another device.</li>
+</ul>
+
+<h4>Managing Your ID</h4>
+<p>In the <strong>Licensing & IDs</strong> menu, you can view your unique ID. It is your responsibility to secure this ID immediately.</p>
+<ul>
+    <li><strong>Burning the ID:</strong> Once you have secured a copy, use the <strong>"Burn ID"</strong> feature. This permanently removes the ID from the dashboard interface.</li>
+    <li><strong>Masking:</strong> After burning, the ID is masked (e.g., <code>8f3a...****</code>) and can never be retrieved through the user interface again.</li>
+</ul>
+
+<h4>Identity Rotation & Emergency Recovery</h4>
+<p>If your Orange Star ID is compromised, stolen, or exposed to an unauthorized party, you must rotate the system's internal security seeds to invalidate the old ID and generate a new one.</p>
+
+<div style="background: #ebf8ff; border-left: 5px solid #3182ce; padding: 15px; margin: 20px 0; border-radius: 4px;">
+    <h5 style="color: #2c5282; margin-top: 0;"><i class="fas fa-sync-alt"></i> Emergency Rotation Protocol</h5>
+    <p>To secure the system after an ID leak, follow these steps to perform a hardware-level reset:</p>
+    <ol>
+        <li>Connect a physical monitor via <strong>HDMI</strong> and a keyboard directly to the Orange Pi.</li>
+        <li>At the system login prompt, enter the dedicated recovery credentials: <strong>User: <code>ussr</code></strong> | <strong>Password: <code>ussr</code></strong>.</li>
+        <li>The system will automatically initiate the <strong>Hardware Integrity Verification</strong> utility.</li>
+    </ol>
+    <p><strong>Note:</strong> This process requires physical access to the console. The utility will perform a security audit and automatically regenerate the system's internal keys. Once the process is complete, your <strong>New Orange Star ID</strong> will be displayed on the screen.</p>
+    <p style="font-size: 0.85rem; color: #2b6cb0;"><em>You must use this new ID to reset your administrative password via the "Forgot Password" mechanism immediately after the rotation is complete.</em></p>
+</div>
+
+<div style="background: #fffaf0; border-left: 5px solid #ff6600; padding: 15px; margin: 20px 0; border-radius: 4px;">
+    <h4 style="color: #d97706; margin-top: 0;"><i class="fas fa-exclamation-circle"></i> Fatal Warning</h4>
+    <p>If you lose your Orange Star ID after burning it, and you also lose your Admin Password, the system becomes <strong>unrecoverable</strong> via the web interface. This is a deliberate security measure to ensure that only the physical owner can maintain control.</p>
+</div>

@@ -1,29 +1,17 @@
 <?php
-class Helper {
-  public static function format_mb($size) {
+/**
+ * [!] By Colton Silva (chinawaterstealers).
+ */
+require_once __DIR__ . '/database.php';
 
-    if( $size < 1 ) return '0MB';
-
-    $base = floor(log($size, 1024));
-    $unit = array('MB','GB','TB','PB','EB','ZB','YB');
-
-    return round($size / pow(1024, $base), 2) . $unit[$base];
+function get_mb_reward($amt) {
+  $db = new Database();
+  $rates = $db->get_rates();
+  
+  if( isset($rates[$amt]) ) {
+    return $rates[$amt];
   }
 
-  public static function amount_mb($peso) {
-    $size = 0;
-    $rates = json_decode(file_get_contents(__DIR__ . '/../conf/rates.json'), true);
-
-    krsort($rates);
-
-    foreach($rates as $amt=>$val) {
-      if( $peso >= $amt ) {
-        $base = floor($peso / $amt);
-        $size = $base * $val + $size;
-        $peso = $peso - ($base * $amt);
-      }
-    }
-
-    return $size;
-  }
+  return 0;
 }
+?>

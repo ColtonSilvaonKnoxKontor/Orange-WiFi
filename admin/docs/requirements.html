@@ -1,0 +1,36 @@
+<h3>System Requirements</h3>
+<p style="color: #64748b; font-weight: 600;">Minimum hardware and configuration specifications for optimal SilvaSystems deployment.</p>
+
+<hr style="margin: 25px 0;">
+
+<h4 style="color: #ff6600;">Required Router Specifications</h4>
+<p>While SilvaSystems is designed to be hardware-agnostic regarding client Access Points, your router must support specific operational modes to function correctly within the architecture.</p>
+
+<p><strong>Router Compatibility:</strong></p>
+<ul>
+    <li>Any affordable or standard router is suitable for use.</li>
+    <li><strong>Mandatory Mode:</strong> The router <strong>MUST</strong> support <code>Bridge Mode</code> or <code>Access Point (AP) Mode</code>.</li>
+    <li><strong>VLAN Support:</strong> Native VLAN tagging and management are currently <strong>NOT SUPPORTED</strong>. Please ensure your network topology does not rely on VLAN for client-to-gateway communication.</li>
+</ul>
+
+<h4 style="color: #ff6600;">Operational Explanation</h4>
+<p>In a standard Piso WiFi deployment, the Orange Pi One handles all DHCP assignments, gateway routing, and traffic shaping. If your router is in its default "Router Mode," it will attempt to create its own internal network (NAT), which conflicts with the SilvaSystems gateway logic.</p>
+
+<p><strong>Why Bridge/AP Mode?</strong></p>
+<ul>
+    <li><strong>Transparent Pass-through:</strong> Allows client devices to communicate directly with the Orange Pi at <code>10.0.0.1</code>.</li>
+    <li><strong>Centralized Management:</strong> Ensures that all IP addresses and sessions are managed by the SilvaSystems distribution.</li>
+    <li><strong>Portal Consistency:</strong> Prevents "Double NAT" scenarios where the captive portal fails to trigger because the client is trapped behind the router's internal firewall.</li>
+</ul>
+
+<hr style="margin: 25px 0;">
+
+<h4 style="color: #ff6600;">Storage Media (SD/TF Card)</h4>
+<p>The stability of the operating system and its underlying databases is highly dependent on the quality of the storage media. Low-performance or counterfeit cards often lead to filesystem corruption and service failures.</p>
+
+<p><strong>Storage Recommendations:</strong></p>
+<ul>
+    <li><strong>Minimum Specification:</strong> Class 10, UHS-I or higher.</li>
+    <li><strong>Recommended Brands:</strong> <code>SanDisk</code> (Ultra/Extreme) or <code>Bavin</code>.</li>
+    <li><strong>Avoid:</strong> Counterfeit cards or unbranded generic media, as they lack the I/O throughput required for consistent database operations.</li>
+</ul>

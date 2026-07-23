@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overview</title>
+    <link rel="stylesheet" href="/css/pico.min.css">
+    <style>
+        body { padding: 20px; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            text-align: center;
+            border: 1px solid #eee;
+        }
+        .card h3 {
+            margin-bottom: 10px;
+            font-size: 1rem;
+            color: #666;
+            text-transform: uppercase;
+        }
+        .card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ff6600;
+        }
+        .card .sub {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 5px;
+        }
+        h2 { border-bottom: 2px solid #ff6600; padding-bottom: 10px; display: inline-block; }
+    </style>
+</head>
+<body>
+    <main>
+        <h2>Dashboard Overview</h2>
+        
+        <h4>Earnings Summary</h4>
+        <div class="stats-grid" id="earnings-grid">
+            <div class="card">
+                <h3>Today</h3>
+                <div class="value" id="day-val">...</div>
+                <div class="sub" id="last-day-val">Yesterday: ...</div>
+            </div>
+            <div class="card">
+                <h3>This Week</h3>
+                <div class="value" id="week-val">...</div>
+                <div class="sub" id="last-week-val">Last Week: ...</div>
+            </div>
+            <div class="card">
+                <h3>This Month</h3>
+                <div class="value" id="month-val">...</div>
+                <div class="sub" id="last-month-val">Last Month: ...</div>
+            </div>
+            <div class="card">
+                <h3>Total Year</h3>
+                <div class="value" id="year-val">...</div>
+                <div class="sub" id="last-year-val">Last Year: ...</div>
+            </div>
+        </div>
+
+        <h4>System Status</h4>
+        <div class="stats-grid">
+            <div class="card">
+                <h3>CPU Temp</h3>
+                <div class="value" id="cpu-temp">...</div>
+                <div class="sub">Degrees Celsius</div>
+            </div>
+            <div class="card">
+                <h3>Uptime</h3>
+                <div class="value" id="uptime" style="font-size: 1.2rem;">...</div>
+            </div>
+            <div class="card">
+                <h3>Active Users</h3>
+                <div class="value" id="active-users">...</div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const peso = new Intl.NumberFormat('en-PH', {style: 'currency', currency: 'PHP'});
+
+        // Global Nuclear Lockdown Handler
+        function checkLocked(r) {
+            if (r.status === 423) {
+                window.top.location.href = '/admin/lockdown.php';
+                return true;
+            }
+            return false;
+        }
+
+        function fetchEarnings() {
+            fetch('../earnings_summary.php')
+                .then(r => {
+                    if(checkLocked(r)) return;
+                    return r.json();
+                })
+                .then(data => {
+                    document.getElementById('day-val').innerText = peso.format(data.day);
+                    document.getElementById('last-day-val').innerText = 'Yesterday: ' + peso.format(data.last_day);
+                    
+                    document.getElementById('week-val').innerText = peso.format(data.week);
+                    document.getElementById('last-week-val').innerText = 'Last Week: ' + peso.format(data.last_week);
+                    
+                    document.getElementById('month-val').innerText = peso.format(data.month);
+                    document.getElementById('last-month-val').innerText = 'Last Month: ' + peso.format(data.last_month);
+                    
+                    document.getElementById('year-val').innerText = peso.format(data.year);
+                    document.getElementById('last-year-val').innerText = 'Last Year: ' + peso.format(data.last_year);
+                });
+        }
+
+        function fetchSystemStats() {
+            // CPU Temp
+            fetch('/api/cpu_temp.php').then(r => {
+                if(checkLocked(r)) return;
+                return r.text();
+            }).then(t => {
+                if(t) document.getElementById('cpu-temp').innerText = parseFloat(t).toFixed(1) + '°';
+            });
+
+            // Uptime
+            fetch('/api/uptime.php').then(r => {
+                if(checkLocked(r)) return;
+                return r.text();
+            }).then(t => {
+                if(t) document.getElementById('uptime').innerText = t;
+            });
+
+            // Active Users Count
+            fetch('../x.php?dev=active').then(r => {
+                if(checkLocked(r)) return;
+                return r.json();
+            }).then(users => {
+                if(users) document.getElementById('active-users').innerText = users.length;
+            });
+        }
+
+        // Init
+        fetchEarnings();
+        fetchSystemStats();
+        
+        // Auto-refresh every 30s
+        setInterval(() => {
+            fetchEarnings();
+            fetchSystemStats();
+        }, 30000);
+    </script>
+</body>
+</html>

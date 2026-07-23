@@ -1,6 +1,6 @@
 function sw_theme(){
   let t = get_theme() !== 'dark' ? 'dark' : 'light';
-  document.cookie = `theme=${t}; max-age=31536000; path=/a/`;
+  document.cookie = `theme=${t}; max-age=31536000; path=/admin/`;
   set_theme();
 }
 function get_theme() {

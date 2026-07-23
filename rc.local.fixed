@@ -1,0 +1,30 @@
+#!/bin/sh -e
+# [!] By Colton Silva (chinawaterstealers).
+# Optimized rc.local for SILVASYSTEMS / Orange WiFi
+
+# Bring up interfaces
+ip link set eth0 up
+ip link set eth1 up
+
+# Setup LAN IP
+ip addr flush dev eth1
+ip addr add 10.0.0.1/24 dev eth1
+
+# Enable IP Forwarding
+sysctl -w net.ipv4.ip_forward=1
+
+# --- IPTABLES SETUP ---
+
+# 1. Flush NAT table to clear the current mess and prevent duplicates
+iptables -t nat -F
+
+# 2. Redirect DNS only for traffic coming FROM the LAN (eth1)
+iptables -t nat -A PREROUTING -i eth1 -p udp --dport 53 -j REDIRECT --to-ports 53
+
+# 3. Redirect HTTP/S only for traffic coming FROM the LAN (eth1)
+iptables -t nat -A PREROUTING -i eth1 -p tcp -m multiport --dports 80,443 -j DNAT --to-destination 10.0.0.1
+
+# 4. Enable NAT Masquerade ONLY for traffic going OUT to the internet (eth0)
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+exit 0

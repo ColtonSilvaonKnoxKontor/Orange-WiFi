@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Licensing & IDs</title>
+    <link rel="stylesheet" href="/css/pico.min.css">
+    <style>
+        body { padding: 20px; }
+        .id-box {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+            text-align: center;
+        }
+        .id-label { font-weight: bold; color: #666; text-transform: uppercase; margin-bottom: 1rem; display: block; }
+        .id-value { font-family: monospace; font-size: 1.2rem; color: #ff6600; word-break: break-all; background: #f9f9f9; padding: 1rem; border-radius: 4px; display: block; margin-bottom: 1.5rem; }
+        .burn-btn { background: #ff4444 !important; border: none !important; color: #fff !important; font-weight: bold; }
+        .help { font-size: 0.8rem; color: #888; margin-top: 1.5rem; }
+        .warning { color: #ff0000; font-weight: bold; font-size: 0.9rem; margin-top: 10px; }
+    </style>
+    <script src="security_check.js"></script>
+</head>
+<body>
+    <main>
+        <h2>Orange Star ID</h2>
+        
+        <div class="id-box">
+            <span class="id-label">Orange Star ID (Recovery Key)</span>
+            <span class="id-value" id="star-id">Loading...</span>
+            
+            <div id="burn-area" style="display:none;">
+                <p class="warning">CAUTION: Write this ID down now! Once you click "BURN IT", the full ID will NEVER be shown on this screen again.</p>
+                <button class="burn-btn" onclick="burnID()">BURN IT!</button>
+            </div>
+
+            <div class="help">This ID is unique to your hardware. It is required to recover your system if the admin password is lost.</div>
+        </div>
+    </main>
+
+    <script>
+        function fetchID() {
+            fetch('../../critical/get_id.php')
+                .then(r => r.text())
+                .then(id => {
+                    document.getElementById('star-id').innerText = id;
+                    // If the ID doesn't contain stars, it's the full ID - show burn button
+                    if (!id.includes('***')) {
+                        document.getElementById('burn-area').style.display = 'block';
+                    } else {
+                        document.getElementById('burn-area').style.display = 'none';
+                    }
+                });
+        }
+
+        function burnID() {
+            if (confirm("Are you sure? You must have written the ID down. This cannot be undone!")) {
+                const payload = JSON.stringify({ action: 'burn_id' });
+                fetch('../../critical/auth.php', {
+                    method: 'POST',
+                    body: payload
+                }).then(() => fetchID());
+            }
+        }
+
+        fetchID();
+    </script>
+</body>
+</html>

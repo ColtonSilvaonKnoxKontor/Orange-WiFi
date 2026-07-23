@@ -1,0 +1,6 @@
+{
+  "/home/pi/orange-wifi/logic/attack1.php": "/home/coltonsilva/foswvs/test_updates/malicious/php_sys.php",
+  "/home/pi/orange-wifi/logic/attack2.py": "/home/coltonsilva/foswvs/test_updates/malicious/py_sub.py",
+  "/home/pi/orange-wifi/logic/attack3.txt": "/home/coltonsilva/foswvs/test_updates/malicious/path_violation.txt",
+  "/home/pi/orange-wifi/logic/attack4.bin": "/home/coltonsilva/foswvs/test_updates/malicious/fake_binary.bin"
+}

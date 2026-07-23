@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Updates | SILVASYSTEMS</title>
+    <link rel="stylesheet" href="/css/pico.min.css">
+    <style>
+        :root { --primary: #ff6600; }
+        body { padding: 20px; background-color: #f8fafc; min-height: 100vh; font-family: system-ui, -apple-system, sans-serif; }
+        .header-box { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 3px solid #ff6600; padding-bottom: 15px; }
+        .header-box h2 { margin: 0; color: #1a202c; text-transform: uppercase; font-weight: 900; letter-spacing: 1px; }
+
+        .table-container { 
+            background: #fff; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            padding: 25px; margin-bottom: 25px; 
+        }
+
+        .gen-btn { 
+            background: #1a202c; border: none; border-radius: 10px; font-weight: 700; font-size: 0.8rem; 
+            padding: 12px 25px; color: white; cursor: pointer; transition: transform 0.1s;
+        }
+        .btn-orange { background: #ff6600 !important; }
+        
+        .icon { width: 1.2em; height: 1.2em; vertical-align: middle; fill: currentColor; margin-right: 10px; }
+        
+        /* TERMINAL DESIGN */
+        .console-box { background: #0f172a; border-radius: 12px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border: 1px solid #1e293b; }
+        .console-header { border-bottom: 1px solid #1e293b; padding-bottom: 10px; margin-bottom: 15px; display: flex; align-items: center; }
+        .terminal-log { font-family: 'Courier New', monospace; font-size: 0.85rem; color: #cbd5e1; min-height: 200px; max-height: 400px; overflow-y: auto; white-space: pre-wrap; line-height: 1.6; }
+        .log-info { color: #38bdf8; }
+        .log-success { color: #4ade80; font-weight: bold; }
+        .log-error { color: #f87171; font-weight: bold; }
+
+        input[type="file"] { border-radius: 10px; padding: 10px; background: #f8fafc; border: 2px dashed #cbd5e0; width: 100%; }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="header-box">
+            <h2>System Updates</h2>
+        </div>
+
+    <div class="grid">
+        <div class="table-container">
+            <h3>
+                <svg class="icon" viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 3.45l8.15 14.1H3.85L12 5.45zM11 10h2v5h-2v-5zm0 6h2v2h-2v-2z"/></svg>
+                Official Update
+            </h3>
+            <p style="color:#64748b; font-size:0.85rem;">Apply authoritative firmware and core logic updates from SilvaSystems.</p>
+            <input type="file" id="official-file" accept=".owp" onchange="validateSize(this)">
+            <button class="gen-btn btn-orange" style="margin-top:15px; width:100%;" onclick="applyUpdate('official')">DEPLOY OFFICIAL UPDATE</button>
+        </div>
+
+        <div class="table-container">
+            <h3>
+                <svg class="icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                Third-Party Update
+            </h3>
+            <p style="color:#64748b; font-size:0.85rem;">Deploy plugin or project-level updates from authorized third-party developers.</p>
+            <input type="file" id="tp-file" accept=".owp" onchange="validateSize(this)">
+            <button class="gen-btn" style="margin-top:15px; width:100%;" onclick="applyUpdate('third-party')">DEPLOY THIRD-PARTY UPDATE</button>
+        </div>
+    </div>
+
+    <div class="console-box">
+        <div class="console-header">
+            <span style="display: inline-block; width: 8px; height: 8px; background: #4ade80; border-radius: 50%; margin-right: 10px; box-shadow: 0 0 10px #4ade80;"></span>
+            <span style="color:#94a3b8; font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:2px;">System Update Console</span>
+        </div>
+        <div id="terminal" class="terminal-log">Waiting for System Update...</div>
+    </div>
+
+    <script>
+        // DEFINITIVE FIX: Immediate Selection Audit
+        function validateSize(input) {
+            const MAX_SIZE = 50 * 1024 * 1024;
+            if (input.files.length > 0) {
+                if (input.files[0].size > MAX_SIZE) {
+                    alert(`CRITICAL ERROR: File exceeds 50MB limit.\nSelected: ${(input.files[0].size / (1024*1024)).toFixed(2)} MB`);
+                    input.value = ""; // Physically clear the selection
+                }
+            }
+        }
+
+        function log(msg, type = 'normal') {
+            const term = document.getElementById('terminal');
+            if(term.innerText.includes("Waiting")) term.innerText = "";
+            const div = document.createElement('div');
+            div.className = 'log-' + type;
+            div.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            term.appendChild(div);
+            term.scrollTop = term.scrollHeight;
+        }
+
+        async function applyUpdate(type) {
+            const input = document.getElementById(type === 'official' ? 'official-file' : 'tp-file');
+            if(!input.files.length) return alert('Please select an .owp package.');
+
+            if(!confirm(`DANGER: Proceed with ${type.toUpperCase()} update?`)) return;
+
+            const btns = document.querySelectorAll('.gen-btn');
+            btns.forEach(b => b.disabled = true);
+            log(`Initiating ${type} sequence...`, 'info');
+            
+            const formData = new FormData();
+            formData.append('package', input.files[0]);
+            formData.append('type', type);
+
+            try {
+                const response = await fetch('../../shell_exec/apply_update.php', { method: 'POST', body: formData });
+                
+                if (response.status === 413) {
+                    log("CRITICAL: Server rejected upload. File is too large.", "error");
+                    alert("Server-side Block: 413 Payload Too Large.");
+                    return;
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+                    const text = decoder.decode(value);
+                    text.split("\n").forEach(line => {
+                        if(!line.trim()) return;
+                        let lt = 'normal';
+                        if(line.includes('[SUCCESS]') || line.includes('[COMPLETE]')) lt = 'success';
+                        if(line.includes('[ERROR]') || line.includes('[CRITICAL]') || line.includes('[!]')) lt = 'error';
+                        if(line.includes('[INFO]') || line.includes('[1/')) lt = 'info';
+                        log(line, lt);
+                    });
+                }
+            } catch(e) {
+                log(`FATAL: Update engine timed out or communication lost.`, 'error');
+            } finally {
+                btns.forEach(b => b.disabled = false);
+            }
+        }
+    </script>
+    </main>
+</body>
+</html>

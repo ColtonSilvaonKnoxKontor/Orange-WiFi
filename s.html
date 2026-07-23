@@ -5,183 +5,147 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-<title>Share</title>
+<title>Share Access</title>
 <link href="/css/pico.min.css" rel="stylesheet">
 <style>
-.alert {
-  background-color: green;
-  text-align: center;
-  color: white;
-  padding: 1em 0;
-  position: fixed;
-  margin: 0;
-  bottom: 0;
-  right: 0;
-  left: 0;
-}
-.error {
-  background-color: red !important;
-}
+    body {
+        background-color: #f3f4f6;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        font-family: system-ui, -apple-system, sans-serif;
+    }
+    article {
+        background: rgba(255, 255, 255, 0.8) !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 1.5rem !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+        padding: 2rem !important;
+        text-align: center;
+    }
+    .share-header { font-weight: 900; color: #ff6600; text-transform: uppercase; margin-bottom: 1.5rem; font-size: 1.2rem; }
+    .alert { background-color: #059669; text-align: center; color: white; padding: 1rem; position: fixed; bottom: 0; left: 0; right: 0; z-index: 2000; font-weight: bold; }
+    .error { background-color: #e53e3e !important; }
+    code { background: #fff5f0; color: #ff6600; font-size: 1.5rem; font-weight: 900; padding: 5px 15px; border-radius: 8px; }
+    input { border-radius: 1rem !important; }
+    button { border-radius: 1rem !important; font-weight: 800 !important; text-transform: uppercase !important; }
 </style>
 </head>
 <body>
 <main class="container">
-  <article style="margin-top:auto !important;">
-    <p>Share <code id="sc">-----</code> to ask data from your peer</p>
+  <article>
+    <div class="share-header">SHARE SESSION</div>
+    <p style="font-size: 0.85rem; color: #64748b;">Give this code to your peer:</p>
+    <code id="sc">-----</code>
     <hr/>
-    <label for="code">Enter code to share your data to your peer</label>
-    <input id="code" type="text" placeholder="CODE" onfocus="this.select();">
-    <input id="size" type="number" placeholder="MB SIZE" onfocus="this.select();">
-    <button id="btn" class="primary" type="button">SHARE DATA</button>
-    <button class="secondary" onclick="location.assign('/')" type="button">CANCEL</button>  
-  </article>
-
-  <article style="display:none;">
-    <label>Share this code to ask data from your peer</label>
-    <input id="sc_" type="text" value="" readonly>
+    <label style="font-size: 0.75rem; font-weight: 800; color: #64748b; text-align: left; display: block; margin-bottom: 0.5rem;">RECEIVE FROM PEER:</label>
+    <input id="code" type="text" placeholder="PEER CODE" onfocus="this.select();">
+    <input id="size" type="number" placeholder="MB TO SHARE" onfocus="this.select();">
+    <button id="btn" class="primary" type="button">SEND DATA</button>
+    <button class="secondary" onclick="location.assign('/')" style="width: 100%; margin-top: 10px;" type="button">CANCEL</button>  
   </article>
 </main>
 <script>
+// --- PORTAL DESIGN ENGINE ---
+(function() {
+    fetch('/css/img/design.json?v=' + Date.now()).then(r => r.json()).then(design => {
+        if (design.background) {
+            const img = new Image(); img.src = design.background;
+            img.onload = () => {
+                document.body.style.backgroundImage = 'url(' + design.background + ')';
+                document.body.style.backgroundSize = 'cover';
+                document.body.style.backgroundPosition = 'center';
+                document.body.style.backgroundAttachment = 'fixed';
+            };
+        }
+        if (design.font) {
+            const s = document.createElement('style');
+            s.innerHTML = `@font-face { font-family: 'PFont'; src: url('/fonts/${design.font}'); font-display: swap; } body { font-family: 'PFont', sans-serif !important; }`;
+            document.head.appendChild(s);
+        }
+    }).catch(() => {});
+})();
+
 const code = document.getElementById('code'),
       size = document.getElementById('size');          
 
 function alert(t, c = 1) {
   let p = document.createElement('p');
-
   p.className = c ? 'alert' : 'alert error';
   p.innerText = t;
-
-  p.addEventListener('click',()=>p.remove());
-
+  p.onclick = () => p.remove();
   document.body.appendChild(p);
-
   setTimeout(()=>p.remove(),5000);
 }
 
 function share_alert() {
   const x = new XMLHttpRequest();
-
-  x.addEventListener('readystatechange', () => {
+  x.onreadystatechange = () => {
     if( x.readyState === 4 ) {
-      if( x.status === 200 ) {
-        alert(x.responseText);
-        share_connect();
-      }
-
-      if( x.status === 204 ) {
-        setTimeout(share_alert,1000);
-      }
+      if( x.status === 200 ) { alert(x.responseText); share_connect(); }
+      if( x.status === 204 ) { setTimeout(share_alert,1000); }
     }
-  });
-
+  };
   x.open('GET','/api/s.php');
   x.send();
 }
 
 function share_connect() {
   const x = new XMLHttpRequest();
-
-  x.addEventListener('readystatechange', () => {
-    if( x.readyState === 4 ) {
-      if( x.status === 200 ) {
-        console.log('connected!');
-      }
-    }
-  });
-
   x.open('POST','/api/connect.php');
   x.send();
 }
 
 function sharetx() {
-  let c = code.value,
-      s = size.value,
-      x = new XMLHttpRequest();
-
-  if( c.length !== 5 ) {
-    alert('Invalid Code', 0);
-    code.focus();
-    return;
-  }
-  
-  if( !Number.isInteger(parseInt(s)) ) {
-    alert('Invalid Size', 0);
-    size.focus();
-    return;
-  }
-
-  x.addEventListener('readystatechange', () => {
-    if( x.readyState === 1 ) {
-      code.value = ''; code.focus();
-    }
-
+  let c = code.value, s = size.value, x = new XMLHttpRequest();
+  if( c.length !== 5 ) { alert('Invalid Code', 0); code.focus(); return; }
+  if( !Number.isInteger(parseInt(s)) ) { alert('Invalid Size', 0); size.focus(); return; }
+  x.onreadystatechange = () => {
     if( x.readyState === 4 ) {
-      if( x.status === 200 ) {
-        alert(x.responseText);
-      }
-
-      if( x.status === 400 ) {
-        alert(x.responseText, 0);
-      }
+      if( x.status === 200 ) alert(x.responseText);
+      if( x.status === 400 ) alert(x.responseText, 0);
     }
-  });
-
+  };
   x.open('PUT','/api/s.php');
   x.send([c,s].join('|'));
 }
 
 function sharetx_code() {
-  let x = new XMLHttpRequest(),
-      s = document.getElementById('sc');
-
-  x.addEventListener('readystatechange',()=> {
-    if( x.readyState === 4 ) {
-      if( x.status === 200 ) {
+  let x = new XMLHttpRequest(), s = document.getElementById('sc');
+  x.onreadystatechange = () => {
+    if( x.readyState === 4 && x.status === 200 ) {
         share_alert();
         s.innerText = x.responseText;
         setInterval(sharetx_code, 6e4);
-      }
     }
-  });
-
+  };
   x.open('POST','/api/s.php');
   x.send();
 }
 
 function format_mb(size) {
   size = parseFloat(size) || 0;
-
-  if( size<1 ) return '0MB';
-
+  if(size<1) return '0MB';
   let base = Math.floor(Math.log(size) / Math.log(1024));
-  let unit = ['MB','GB','TB','PB','EB','ZB','YB'];
-
-  size = size / Math.pow(1024, base);
-  size = Number.isInteger(size) ? size : size.toFixed(2);
-
-  return size + unit[base];
+  let unit = ['MB','GB','TB'];
+  return (size / Math.pow(1024, base)).toFixed(1) + unit[base];
 }
 
 document.addEventListener('DOMContentLoaded', sharetx_code);
-
-document.addEventListener('keypress',(e)=> {
-  if( e.keyCode === 13 ) {
-    sharetx();
-  }
-});
-
-let b = document.getElementById('btn');
-
-b.addEventListener('click', sharetx);
-
-size.addEventListener('keyup', ()=> {
-  if( !Number.isInteger(parseInt(size.value)) ) {
-    return;
-  }
-
-  b.innerText = 'share ' + format_mb(size.value);
-  b.style.textTransform = 'uppercase';
-});
+btn = document.getElementById('btn');
+btn.onclick = sharetx;
+size.onkeyup = () => {
+  if( !Number.isInteger(parseInt(size.value)) ) return;
+  btn.innerText = 'share ' + format_mb(size.value);
+};
 </script>
 </body>
 </html>

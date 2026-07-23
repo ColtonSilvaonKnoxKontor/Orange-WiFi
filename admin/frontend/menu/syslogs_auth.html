@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication Log</title>
+    <link rel="stylesheet" href="/css/pico.min.css">
+    <style>
+        body { padding: 20px; height: 100vh; display: flex; flex-direction: column; box-sizing: border-box; overflow: hidden; }
+        h2 { margin-bottom: 10px; flex-shrink: 0; }
+        #log-container {
+            background: #222;
+            color: #ffd700; /* Gold color for auth logs */
+            font-family: 'Courier New', Courier, monospace;
+            padding: 15px;
+            overflow-y: auto;
+            border-radius: 4px;
+            flex-grow: 1;
+            white-space: pre-wrap;
+            font-size: 0.85rem;
+            border: 1px solid #444;
+        }
+        .controls { margin-bottom: 10px; flex-shrink: 0; display: flex; gap: 10px; }
+        .controls button { width: auto; padding: 5px 20px; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <h2>Authentication Log</h2>
+    <div class="controls">
+        <button onclick="fetchLog()">Refresh</button>
+        <button class="secondary" onclick="clearLog()">Clear View</button>
+    </div>
+    <div id="log-container">Loading auth logs...</div>
+
+    <script>
+        function fetchLog() {
+            const container = document.getElementById('log-container');
+            container.style.opacity = '0.5';
+            
+            fetch('../../shell_exec/auth_log.php')
+                .then(r => {
+                    if(!r.ok) throw new Error("Access Denied");
+                    return r.text();
+                })
+                .then(data => {
+                    container.innerText = data || "No logs available (or permission denied).";
+                    container.scrollTop = container.scrollHeight;
+                    container.style.opacity = '1';
+                })
+                .catch(e => {
+                    container.innerText = "Error loading logs: " + e.message;
+                    container.style.opacity = '1';
+                });
+        }
+        
+        function clearLog() {
+            document.getElementById('log-container').innerText = '';
+        }
+
+        fetchLog();
+    </script>
+</body>
+</html>

@@ -7,84 +7,155 @@
 <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 <title>Transaction History</title>
 <link href="/css/pico.min.css" rel="stylesheet">
+<style>
+    body {
+        background-color: #f3f4f6;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        font-family: system-ui, -apple-system, sans-serif;
+    }
+    article {
+        background: rgba(255, 255, 255, 0.8) !important;
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-radius: 2rem !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 500px;
+        padding: 2rem !important;
+        text-align: center;
+    }
+    .history-header { font-weight: 900; color: #ff6600; text-transform: uppercase; margin-bottom: 1.5rem; font-size: 1.5rem; letter-spacing: 1px; }
+    
+    .table-container { border-radius: 1rem; overflow: hidden; background: rgba(255,255,255,0.4); border: 1px solid rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+    table { margin: 0; }
+    th { font-size: 0.65rem; color: #64748b; text-transform: uppercase; font-weight: 800; padding: 15px 10px; }
+    td { font-size: 0.85rem; padding: 12px 10px; vertical-align: middle; border-bottom: 1px solid rgba(0,0,0,0.03); }
+    
+    .amt-text { font-weight: 900; color: #1e293b; }
+    .date-text { color: #64748b; font-size: 0.75rem; font-weight: 600; }
+    .data-badge { background: #fff5f0; color: #ff6600; padding: 2px 8px; border-radius: 6px; font-weight: 800; font-size: 0.75rem; }
+    
+    .summary-box { background: #1e293b; color: white; padding: 1rem; border-radius: 1rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+    .summary-item { text-align: center; flex: 1; }
+    .summary-item label { font-size: 0.6rem; text-transform: uppercase; opacity: 0.7; font-weight: 800; display: block; margin-bottom: 2px; }
+    .summary-item span { font-weight: 900; font-size: 1.1rem; }
+
+    button.secondary { border-radius: 1rem; font-weight: 800; text-transform: uppercase; margin: 0; }
+    svg { fill: currentColor; width: 18px; height: 18px; vertical-align: middle; margin-right: 8px; }
+</style>
 </head>
 <body>
 <main>
-  <article style="margin-top:auto !important;">
-    <center>TRANSACTION HISTORY</center>
-    <hr/>
-    <table role="grid">
-      <thead>
-        <tr><th>AMT</th><th>DATE</th><th>DATA</th></tr>
-      </thead>
-      <tbody>
-      </tbody>
-    </table>
-    <button class="secondary" onclick="location.assign('/')" type="button">CANCEL</button>  
+  <article>
+    <div class="history-header">USAGE LOGS</div>
+
+    <div class="summary-box">
+        <div class="summary-item">
+            <label>Total Paid</label>
+            <span id="total-amt">₱0.00</span>
+        </div>
+        <div class="summary-item" style="border-left: 1px solid rgba(255,255,255,0.1);">
+            <label>Total Data</label>
+            <span id="total-data">0MB</span>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table role="grid">
+          <thead>
+            <tr>
+                <th style="text-align: left;">Details</th>
+                <th style="text-align: right;">Amount</th>
+            </tr>
+          </thead>
+          <tbody id="txn-list">
+            <tr><td colspan="2">Syncing records...</td></tr>
+          </tbody>
+        </table>
+    </div>
+
+    <button class="secondary" onclick="location.assign('/')" type="button">
+        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        Back to Portal
+    </button>  
   </article>
 </main>
 <script>
+// --- PORTAL DESIGN ENGINE ---
+(function() {
+    fetch('/css/img/design.json?v=' + Date.now()).then(r => r.json()).then(design => {
+        if (design.background) {
+            const img = new Image(); img.src = design.background;
+            img.onload = () => {
+                document.body.style.backgroundImage = 'url(' + design.background + ')';
+                document.body.style.backgroundSize = 'cover';
+                document.body.style.backgroundPosition = 'center';
+                document.body.style.backgroundAttachment = 'fixed';
+            };
+        }
+        if (design.font) {
+            const s = document.createElement('style');
+            s.innerHTML = `@font-face { font-family: 'PFont'; src: url('/fonts/${design.font}'); font-display: swap; } body { font-family: 'PFont', sans-serif !important; }`;
+            document.head.appendChild(s);
+        }
+    }).catch(() => {});
+})();
+
 const peso = Intl.NumberFormat('en-PH', {style: 'currency', currency: 'PHP'});
-var amount = 0, tx_count = 0, mb_limit = 0;
-
-function txnHistory(txn) {
-     amount = amount + txn.amt;
-   mb_limit = mb_limit + txn.mb_limit; tx_count++;
-  let table = document.getElementsByTagName('tbody')[0],
-        row = table.insertRow(-1),
-    col_amt = row.insertCell(0),
-     col_ts = row.insertCell(1),
-     col_mb = row.insertCell(2),
-    txt_amt = document.createTextNode(txn.amt==0 ? 'FREE' : peso.format(txn.amt)),
-     txt_mb = document.createTextNode(format_mb(txn.mb_limit)),
-     txt_ts = document.createTextNode(utc_to_local(txn.ts));
-
-    col_amt.appendChild(txt_amt);
-     col_mb.appendChild(txt_mb);
-     col_ts.appendChild(txt_ts);
-}
-
-function notxn(){
-  let table = document.getElementsByTagName('tbody')[0],
-        row = table.insertRow(-1),
-      blank = row.insertCell(0);
-
-      blank.setAttribute('colspan', 3);
-      blank.style.textAlign = 'center';
-      blank.appendChild(document.createTextNode('No Transaction History'));
-}
-
-function totaltxn(){
-  let table = document.getElementsByTagName('tbody')[0],
-        row = table.insertRow(-1),
-      blank = row.insertCell(0);
-
-      blank.setAttribute('colspan', 3);
-      blank.appendChild(document.createTextNode(`${peso.format(amount)} / ${format_mb(mb_limit)} / ${tx_count} TRANSACTION${tx_count>1?'S':''}`));
-      blank.style.textAlign='center';
-}
-
-function utc_to_local(ts) {
-  return new Date(parseInt(ts)).toLocaleString("en-US", {timeZone: 'Asia/Manila', hour12: true});
-}
 
 function format_mb(size) {
-  if( !size ) return size + 'MB';
-
+  size = parseFloat(size) || 0;
+  if(size < 1) return '0MB';
   let base = Math.floor(Math.log(size) / Math.log(1024));
-  let unit = ['MB','GB','TB','PB','EB','ZB','YB'];
-
-  size = size / Math.pow(1024, base);
-  size = Number.isInteger(size) ? size : parseFloat(size).toFixed(2);
-
-  return size + unit[base];
+  let unit = ['MB','GB','TB'];
+  return (size / Math.pow(1024, base)).toFixed(1) + unit[base];
 }
 
-function getDeviceTxn() {
-  fetch('/api/txn.php').then((x) => x.json()).then((x) => { x.forEach((tx) => { tx.ts ? txnHistory(tx) : notxn(); }); totaltxn(); });
+function loadHistory() {
+    fetch('/api/txn.php').then(r => r.json()).then(data => {
+        const tbody = document.getElementById('txn-list');
+        tbody.innerHTML = '';
+        let totalAmt = 0;
+        let totalMB = 0;
+
+        if (data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="2" style="padding: 30px; opacity: 0.6;">No transactions recorded.</td></tr>';
+            return;
+        }
+
+        data.forEach(tx => {
+            totalAmt += tx.amt;
+            totalMB += tx.mb_limit;
+            
+            const timeStr = new Date(parseInt(tx.ts)).toLocaleTimeString('en-PH', {hour: '2-digit', minute: '2-digit'});
+            const dateStr = new Date(parseInt(tx.ts)).toLocaleDateString('en-PH', {month: 'short', day: 'numeric'});
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td style="text-align: left;">
+                    <div class="amt-text">${tx.amt > 0 ? peso.format(tx.amt) : 'FREE SESSION'}</div>
+                    <div class="date-text">${dateStr} • ${timeStr}</div>
+                </td>
+                <td style="text-align: right;">
+                    <span class="data-badge">${format_mb(tx.mb_limit)}</span>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        document.getElementById('total-amt').innerText = peso.format(totalAmt);
+        document.getElementById('total-data').innerText = format_mb(totalMB);
+    });
 }
 
-getDeviceTxn();
+loadHistory();
 </script>
 </body>
 </html>

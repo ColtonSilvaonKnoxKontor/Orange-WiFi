@@ -1,69 +1,99 @@
 #!/usr/bin/php
-<?php
+<?php // [!] By Colton Silva (chinawaterstealers).
 require __DIR__ . '/../lib/autoload.php';
+
+$lockFile = '/tmp/silvasystems_watchdog.lock';
+$lock = fopen($lockFile, 'c+');
+if (!flock($lock, LOCK_EX | LOCK_NB)) exit;
 
 $db = new Database();
 
-$cmd = shell_exec("sudo iptables -nvxL FORWARD --line-numbers|awk 'NR>2{print $1 \"|\" $3 \"|\" $9 \"|\" $10}'");
+while (true) {
+    $authorized_macs = [];
+    $authorized_ips = [];
+    $expired_devices = [];
 
-if( empty($cmd) ) { sleep(10); exit; }
+    $q = $db->query("SELECT d.id as did, d.mac_addr, d.ip_addr, s.id as sid, s.mb_limit, s.mb_used, s.time_limit_min, s.created_at FROM session s JOIN devices d ON d.id=s.device_id");
+    
+    $now = time();
+    while($row = $q->fetchArray(SQLITE3_ASSOC)) {
+        $mb_ok = ($row['mb_limit'] > 0 && floatval($row['mb_used']) < floatval($row['mb_limit']));
+        $created = is_numeric($row['created_at']) ? (int)$row['created_at'] : strtotime($row['created_at']);
+        $time_ok = ($row['time_limit_min'] > 0 && ($now - $created) < ($row['time_limit_min'] * 60));
 
-$data = explode("\n", trim($cmd));
-$temp = [];
+        if ($mb_ok || $time_ok) {
+            $authorized_macs[] = strtoupper($row['mac_addr']);
+            $authorized_ips[] = $row['ip_addr'];
+        } else {
+            // GO SIGNAL: Expiry detected. 
+            $expired_devices[] = ['ip' => $row['ip_addr'], 'mac' => strtoupper($row['mac_addr'])];
+        }
+    }
 
-foreach($data as $d) {
-  $a = explode("|", trim($d));
-  $ip = '1.1.1.1';
+    // TRIGGER CLEANUP FOR EXPIRED SESSIONS
+    foreach ($expired_devices as $dev) {
+        $ipt = new Iptables($dev['ip']);
+        $ipt->mac = $dev['mac'];
+        $ipt->rem_client(); 
+    }
 
-  $rulenum = $a[0];
-  $mb_used = $a[1] / 1e6;
+    // RESTORATION (Positive Enforcement)
+    // If a valid user is missing from the firewall (e.g. after service restart), re-add them.
+    foreach ($authorized_ips as $idx => $ip) {
+        $mac = $authorized_macs[$idx];
+        $ipt = new Iptables($ip);
+        $ipt->mac = $mac;
+        if (!$ipt->connected()) {
+            $ipt->add_client();
+        }
+    }
 
-  $ip_src = $a[2];
-  $ip_dst = $a[3];
+    // KERNEL AUDIT - DISABLED FOR STABILITY
+    /*
+    foreach (['filter', 'nat'] as $table) {
+        $rules = shell_exec("sudo iptables -t $table -S");
+        if (!$rules) continue;
+        foreach (explode("\n", trim($rules)) as $line) {
+            if (strpos($line, 'REDIRECT') !== false || strpos($line, 'DNAT') !== false || strpos($line, 'dport 853') !== false || strpos($line, 'dport 443 -j REJECT') !== false) continue;
+            if (strpos($line, '-j ACCEPT') === false) continue;
 
-  if( date('G') != 0 && $mb_used == 0 ) continue;
+            $kill = false; $ipToKick = null;
+            if (preg_match('/--mac-source ([0-9A-F:]{17})/i', $line, $m)) {
+                if (!in_array(strtoupper($m[1]), $authorized_macs)) $kill = true;
+            } else if (preg_match('/-s (\d+\.\d+\.\d+\.\d+)/', $line, $m)) {
+                if (strpos($m[1], '10.0.0') === 0 && !in_array($m[1], $authorized_ips)) { $kill = true; $ipToKick = $m[1]; }
+            }
 
-  exec("sudo iptables -Z FORWARD {$rulenum}");
+            if ($kill) {
+                $cmd = str_replace("-A", "-D", $line);
+                shell_exec("sudo iptables -t $table $cmd 2>/dev/null");
+                if ($ipToKick) {
+                    $socket_path = "/run/silvasystems_conntrack.sock";
+                    if (file_exists($socket_path)) {
+                        $socket = @socket_create(AF_UNIX, SOCK_STREAM, 0);
+                        if ($socket && @socket_connect($socket, $socket_path)) { @socket_write($socket, $ipToKick, strlen($ipToKick)); }
+                        if ($socket) @socket_close($socket);
+                    }
+                }
+            }
+        }
+    }
+    */
 
-  if( strpos($ip_src,'10.0') === 0 ) {
-    $ip = $ip_src;
-  }
-
-  if( strpos($ip_dst,'10.0') === 0 ) {
-    $ip = $ip_dst;
-  }
-
-  if( strpos($ip,'10.0') !== 0 ) continue;
-
-  $temp[$ip] = $mb_used + ($temp[$ip] ?? 0);
+    // ACCOUNTING
+    $acc = shell_exec("sudo iptables -nvxL FORWARD --line-numbers");
+    if ($acc) {
+        foreach(explode("\n", trim($acc)) as $line) {
+            if (preg_match('/^\s*(\d+)\s+\d+\s+(\d+)\s+ACCEPT\s+.*?\s+eth1\s+.*?\s+([\d\.]+)\s+/', $line, $m)) {
+                $bytes = (float)$m[2]; $ip_src = $m[3];
+                if ($bytes > 100000 && $ip_src !== '10.0.0.1') {
+                    $mb_used = $bytes / 1000000;
+                    shell_exec("sudo iptables -Z FORWARD {$m[1]}");
+                    $db->query("UPDATE session SET mb_used = mb_used + $mb_used, updated_at = $now WHERE id = (SELECT s.id FROM session s JOIN devices d ON d.id=s.device_id WHERE d.ip_addr='$ip_src' ORDER BY s.id DESC LIMIT 1)");
+                }
+            }
+        }
+    }
+    usleep(500000);
 }
-
-if( count($temp) === 0 ) { sleep(10); exit; }
-
-foreach($temp as $ip=>$mb) {
-  $dt = date('Y-m-d H:i:s');
-
-  $db->set_mb_used($mb);
-  $db->set_ip($ip);
-
-  if( !$db->get_device_id_by_ip() ) {
-    $ipt = new Iptables($ip);
-    $ipt->rem_client();
-    continue;
-  }
-
-  if( $mb != 0 ) {
-    $db->update_mb_used(); usleep(25e4);
-  }
-
-  list($mb_limit,$mb_used) = $db->get_data_usage();
-
-  if( $mb_limit <= $mb_used ) {
-    $ipt = new Iptables($ip);
-    $ipt->rem_client();
-  }
-}
-
-$db->clear_sharetx();
-
-if( count($temp) < 4 ) sleep(1);
+?>
