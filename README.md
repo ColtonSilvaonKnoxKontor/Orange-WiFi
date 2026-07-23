@@ -1,6 +1,6 @@
-# Orange WiFi (alpha and beta release)
+# Orange WiFi (currently abandoned)
 
-> Work in Progress
+> I published the source code as I stopped developing this, and I am no longer operating exploited Piso WiFi systems. Take note that all of the source code are AI generated via Gemini CLI until transition to their bullshit Antigravity so you can see some slop comments like "Authoritative" or "Editions".
 
 <i>**A Free Piso WiFi Software made for Paranoids**</i>
 
