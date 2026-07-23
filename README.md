@@ -8,6 +8,10 @@ They contain mess from unrelated source code and other artifacts that needs to r
 
 The `nkvd_password` is meant for frontend access to ssh so that no one can touch the internal Armbian binaries and serves as reshuffler of hardware ID, same concept as DVR and ISP routers that uses Dopra Linux in Huawei GPON/EPON term. It uses soviet-era dialog and it serves as my entertainment rather than professional-look text interface. `softup` is meant for software update binary for Orange-WiFi and of course updating Armbian.
 
+# Bout' this repository
+
+Orange-WiFi is a direct and improved version of https://github.com/foswvs/foswvs where I converted much of it's html codebase into more of a PHP source code, modernized interface and it includes proof of concept security and mixed encryption.
+
 <i>**A Free Piso WiFi Software made for Paranoids**</i>
 
 Orange WiFi is a single, non-centralized vendo software for Piso WiFi, suitable for inexpensive builds.  As for now,  it only supports Orange Pi One unit. This is free to use, no **fucking license** needed as I am loyal to free and open source software.
@@ -64,7 +68,3 @@ No, it only includes coin and voucher for Wi-Fi vending needs. No PPPoE, e-Walle
 # Security ToDo
 
 Since this is based on Armbian image, the chance on getting attacked by using RCE is high (based on my previous vulnerability investigation with commercial brand, in Armbian-based system), unlike the OpenWRT-based which the system is definitely read only and then only configs, datas and states are on a separate read-write partition. Another problem is that obfuscating php is useless here as anyone can create the deobfuscator easily, or they can download to github, so I leave the php file as is except for critical ones. I will strengthen the software security just to block RCE entrypoint.
-
-# But where is the Source Code:
-
-I do not publish the source code in public, only on another private repository to avoid potential modification and exploitation. But for a general idea 'bout this system, you may refer to: https://github.com/foswvs/foswvs in which this was the starting point on improving the codebase. To access private repository, just tell me.
