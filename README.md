@@ -20,6 +20,17 @@ This software enforces security measures, warnings and mandatory lockdown mechan
 
 <img width="720" height="1600" alt="portal" src="https://github.com/user-attachments/assets/ad1be687-cf47-49f2-bb3f-c6c2135779ff" /> <br />This is a preview of incomplete alpha build, it may change or remove features that are still existing, mostly from foswvs artifacts.
 
+# Screenshot
+
+Here's the screenshot view of the admin dashboard
+
+<img width="1280" height="800" alt="dev" src="https://github.com/user-attachments/assets/2c59654b-56a0-455b-9554-b1d56a10e496" /> Developer key page to authorize third party update, but updating the armbian/dietpi is restricted.
+
+<img width="1280" height="800" alt="logs" src="https://github.com/user-attachments/assets/539ccfba-8f26-4d81-abfb-c97394a40763" /> Web access log to see which IP address request and identify itself legitimately, and for those who attempting to exploit or crack the Orange WiFi system, like Python scripts, DoS and DDoS attacks and fuzzers.
+
+<img width="1280" height="800" alt="Screenshot From 2026-03-19 12-07-00" src="https://github.com/user-attachments/assets/1cf15dea-d2cc-4450-996d-496e9c801205" />
+The main dashboard overview of the Orange WiFi.
+
 # Features
 - Latest Armbian version, minimal build.
 
